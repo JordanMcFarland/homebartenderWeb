@@ -4,9 +4,9 @@ import { Card, CardImg, CardBody, CardSubtitle, CardTitle } from 'reactstrap';
 
 function RenderCocktail({ cocktail }) {
   return (
-    <div className="col-md-5 m-1">
+    <div className="col-lg-7 col-md-9 mx-auto">
       <Card>
-        <CardTitle className="mx-auto mt-2">{cocktail.name}</CardTitle>
+        <CardTitle className="mx-auto pt-2">{cocktail.name}</CardTitle>
         <CardBody>
         <CardImg src={cocktail.image} width="30"></CardImg>
           <CardSubtitle className="mb-2 text-muted">Ingredients:</CardSubtitle>
@@ -30,7 +30,7 @@ function CocktailInfo(props) {
 
     //console.log(props.cocktail);
     return (
-      <div className="container">
+      <div className="container py-3">
         <div className="row">
           <RenderCocktail cocktail={cocktail} />
         </div>
