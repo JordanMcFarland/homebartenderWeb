@@ -16,13 +16,13 @@ function RenderDirectoryItem({ cocktail }) {
 }
 
 function CocktailDirectory(props) {
-  const [searchTerm, setSearchTerm] = useState('gin, lemon juice');
-  const [searchBy, setSearchBy] = useState("byName");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchBy, setSearchBy] = useState('byName');
   const [cockTailDirectory, setCocktailDirectory] = useState(props.cocktails);
 
   useEffect(() => {
-    //searchByName();\
-    searchByIngredients();
+    searchByName();
+    //searchByIngredients();
     //console.log(cockTailDirectory);
     console.log(searchBy);
   }, [searchTerm])
@@ -48,25 +48,21 @@ function CocktailDirectory(props) {
   }
 
   const searchByIngredients = () => {
-    const newSearchTerms = searchTerm.split(', ');
-    console.log(newSearchTerms);
+  const newSearchTerms = searchTerm.split(', ');
+  console.log(newSearchTerms);
 
-    const filteredCocktails = props.cocktails.filter(cocktail => {
-      const arr = [];
-      return newSearchTerms.forEach(term => {
-        const item = cocktail.requiredIngredients.filter(ingredient => ingredient.toUpperCase().includes(term.toUpperCase()));
-        console.log('item;', item);
-      })
+  const filteredCocktails = props.cocktails.filter(cocktail => {
+  // const arr = [];
+  // return newSearchTerms.forEach(term => {
+  // const item = cocktail.requiredIngredients.filter(ingredient => ingredient.toUpperCase().includes(term.toUpperCase()));
+  // console.log('item;', item);
+  // })
 
-
-
-
-
-      // return cocktail.requiredIngredients.some(ingredient => newSearchTerms.some(searchTerm => {
-      //   return searchTerm.toUpperCase().includes(ingredient.toUpperCase());
-      // }));
-    })
-    setCocktailDirectory(filteredCocktails);
+  return cocktail.requiredIngredients.some(ingredient => newSearchTerms.some(searchTerm => {
+    return searchTerm.toUpperCase().includes(ingredient.toUpperCase());
+  }));
+  })
+  setCocktailDirectory(filteredCocktails);
   }
 
   return (

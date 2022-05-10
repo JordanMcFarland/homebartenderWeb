@@ -11,7 +11,7 @@ const Header = () => {
 
   return(
     <>
-      <div className='bg-light p-5 rounded-lg m-3' fluid>
+      <div className='bg-light p-5 rounded-lg m-3' fluid="true">
         <div className='container'>
           <div className='row'>
             <div className='col'>
@@ -31,8 +31,8 @@ const Header = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink className='nav-link' to='/ingredientdirectory'>
-                  Ingredient List
+                <NavLink className='nav-link' to='/cocktailcreator'>
+                  Cocktail Creator
                 </NavLink>
               </NavItem>
             </Nav>

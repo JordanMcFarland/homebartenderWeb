@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import CocktailDirectory from './CocktailDirectoryComponent';
 import CocktailInfo from './CocktailInfoComponent';
-import IngredientDirectory from './IngredientDirectoryComponent';
+import CocktailCreator from './CocktailCreatorComponent';
 import Header from './HeaderComponent';
 import { Routes, Route } from 'react-router-dom';
 import { COCKTAILS } from '../shared/cocktailList';
@@ -9,7 +9,11 @@ import { INGREDIENTS } from '../shared/ingredients';
 
 const Main = ({history}) => {
   const [cocktails, setCocktails] = useState(COCKTAILS);
-  const [ingredients, setIngredients] = useState(INGREDIENTS);
+  const [ingredients] = useState(INGREDIENTS);
+
+  const addCocktail = (cocktail) => {
+    setCocktails([...cocktails, cocktail])
+  }
   /*
   constructor(props) {
     super(props);
@@ -39,7 +43,7 @@ const Main = ({history}) => {
         <Routes>
           <Route path='/directory/:id' element={<CocktailInfo cocktails={cocktails} />} />
           <Route path='/directory' element={<CocktailDirectory cocktails={cocktails} />} />
-          <Route path='/ingredientdirectory' element={<IngredientDirectory ingredients={ingredients} />} />
+          <Route path='/cocktailcreator' element={<CocktailCreator ingredients={ingredients} cocktails={cocktails} addCocktail={addCocktail} />} />
         </Routes>
       </>
     );
