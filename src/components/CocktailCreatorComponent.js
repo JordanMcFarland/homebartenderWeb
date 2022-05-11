@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import IngredientDirectory from './IngredientDirectoryComponent';
 import { Form, FormGroup, Button, Collapse, Label, Input } from 'reactstrap';
 
@@ -7,39 +7,42 @@ import { Form, FormGroup, Button, Collapse, Label, Input } from 'reactstrap';
 function CocktailCreator({ ingredients, addCocktail, cocktails }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
   const [newCocktail, setNewCocktail] = useState({ id: null, name: '', requiredIngredients: [], recipe: '' });
-  const [ingredientList, setIngredientList] = useState([]);
+  //const [ingredientList, setIngredientList] = useState([]);
+
+  useEffect(() => {
+    console.log(newCocktail);
+  }, [newCocktail]);
 
   const toggleIngredients = () => setIsOpenIngredients(!isOpenIngredients);
 
   const updateNewCocktail = (e) => {
     console.log('cocktail updated');
-    const target = e.target;
-    const name = target.name;
-    const value = target.value;
-
+    const { name, value } = e.target;
     setNewCocktail({...newCocktail, [name]: value})
   }
 
-  const updateIngredientList = (ingredient) => {
-    if (!ingredientList.includes(ingredient)) {
-    setIngredientList([...ingredientList, ingredient]);
-    setNewCocktail({...newCocktail, requiredIngredients: ingredientList});
-    console.log(ingredient + ' has been added to list');
+  const toggleIngredient = (ingredient) => {
+    const newData = {...newCocktail};
+    if (!newCocktail.requiredIngredients.includes(ingredient)) {
+      newData.requiredIngredients = [...newData.requiredIngredients, ingredient]
+      console.log(ingredient + ' has been added to list');
+    } else {
+      newData.requiredIngredients = newData.requiredIngredients.filter((item) => item !== ingredient)
     }
+    setNewCocktail(newData);
   }
     // can these two functions be combined?
-  const removeIngredient = (unwantedIngredient) => {
-    if (ingredientList.includes(unwantedIngredient)) {
-      setIngredientList(ingredientList.filter((ingredient) => ingredient !== unwantedIngredient));
-      setNewCocktail({...newCocktail, requiredIngredients: ingredientList});
-      console.log(unwantedIngredient + ' has been removed from list');
-    }
-  }
+  // const removeIngredient = (unwantedIngredient) => {
+  //   if (ingredientList.includes(unwantedIngredient)) {
+  //     setIngredientList(ingredientList.filter((ingredient) => ingredient !== unwantedIngredient));
+  //     setNewCocktail({...newCocktail, requiredIngredients: ingredientList});
+  //     console.log(unwantedIngredient + ' has been removed from list');
+  //   }
+  // }
 
-  const commitCocktail = (e) =>{
+  const commitCocktail = (e) => {
     newCocktail.id = cocktails.length; //there has to be a better way to do this
     addCocktail(newCocktail);
-    console.log(cocktails);
     e.preventDefault();
   }
 
@@ -71,7 +74,7 @@ function CocktailCreator({ ingredients, addCocktail, cocktails }) {
                   Toggle Ingredients
                 </Button>
                 <Collapse isOpen={isOpenIngredients}>
-                  <IngredientDirectory ingredients={ingredients} updateIngredientList={updateIngredientList} removeIngredient={removeIngredient} />
+                  <IngredientDirectory ingredients={ingredients} toggleIngredient={toggleIngredient} />
                 </Collapse>
               </div>
             </FormGroup>
