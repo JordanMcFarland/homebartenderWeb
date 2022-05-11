@@ -70,11 +70,7 @@ function CocktailDirectory(props) {
         // Convert search term to upper case and remove whitespace at beginning and end
         const term = searchTerm.toUpperCase().trim();
         // Check each search term to see if there is a cocktail ingredient that contains it
-        if (
-          !requiredIngredients.some(ingredient =>
-            ingredient.toUpperCase().includes(term)
-          )
-        ) {
+        if (!requiredIngredients.some(ingredient => ingredient.toUpperCase().includes(term))) {
           // If not, set the boolean to false to flag that this cocktail should not go in the list
           hasIngredients = false;
         }
