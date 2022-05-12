@@ -1,12 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, CardImg, CardBody, CardSubtitle, CardTitle } from 'reactstrap';
+import { Card, CardImg, CardBody, CardSubtitle, CardTitle, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 function RenderCocktail({ cocktail }) {
+  const [buttonDropdownIsOpen, toggleButtonDropDown] = useState(false);
+
   return (
     <div className="col-lg-7 col-md-9 mx-auto">
       <Card>
-        <CardTitle className="mx-auto pt-2">{cocktail.name}</CardTitle>
+        <div className="row pt-2 mx-3">
+          <div className="col-8 offset-2">
+            <CardTitle className="d-flex justify-content-center">{cocktail.name}</CardTitle>
+          </div>
+          <div className="col-1 offset-1">
+            <ButtonDropdown isOpen={buttonDropdownIsOpen} toggle={() => toggleButtonDropDown(!buttonDropdownIsOpen)}>
+              <DropdownToggle caret />
+              <DropdownMenu>
+                <DropdownItem>Edit</DropdownItem>
+                <DropdownItem>Delete</DropdownItem>
+              </DropdownMenu>
+            </ButtonDropdown>
+          </div>
+        </div>
         <CardBody>
         <CardImg src={cocktail.image} width="30"></CardImg>
           <CardSubtitle className="mb-2 text-muted">Ingredients:</CardSubtitle>

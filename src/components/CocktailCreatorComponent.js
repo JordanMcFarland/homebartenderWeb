@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import IngredientDirectory from './IngredientDirectoryComponent';
 import { Form, FormGroup, Button, Collapse, Label, Input } from 'reactstrap';
 
-// Why doesn't the ingredient list update properly?
-
 function CocktailCreator({ ingredients, addCocktail, cocktails }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
-  const [newCocktail, setNewCocktail] = useState({ id: null, name: '', requiredIngredients: [], recipe: '' });
-  //const [ingredientList, setIngredientList] = useState([]);
-
-  useEffect(() => {
-    console.log(newCocktail);
-  }, [newCocktail]);
+  const [newCocktail, setNewCocktail] = useState({ id: null, name: '', requiredIngredients: [], recipe: '', image: '' });
 
   const toggleIngredients = () => setIsOpenIngredients(!isOpenIngredients);
 
   const updateNewCocktail = (e) => {
-    console.log('cocktail updated');
     const { name, value } = e.target;
     setNewCocktail({...newCocktail, [name]: value})
   }
@@ -31,19 +23,18 @@ function CocktailCreator({ ingredients, addCocktail, cocktails }) {
     }
     setNewCocktail(newData);
   }
-    // can these two functions be combined?
-  // const removeIngredient = (unwantedIngredient) => {
-  //   if (ingredientList.includes(unwantedIngredient)) {
-  //     setIngredientList(ingredientList.filter((ingredient) => ingredient !== unwantedIngredient));
-  //     setNewCocktail({...newCocktail, requiredIngredients: ingredientList});
-  //     console.log(unwantedIngredient + ' has been removed from list');
-  //   }
-  // }
 
   const commitCocktail = (e) => {
-    newCocktail.id = cocktails.length; //there has to be a better way to do this
+    newCocktail.id = cocktails.length;
     addCocktail(newCocktail);
+    alert(newCocktail.name + ' has been added to the cocktail list.');
     e.preventDefault();
+  }
+
+  const getImage = (e) => {
+    console.log(e.target.files[0].name);
+    let img = e.target.files[0];
+    setNewCocktail({...newCocktail, image: URL.createObjectURL(img)})
   }
 
   return (
@@ -84,6 +75,10 @@ function CocktailCreator({ ingredients, addCocktail, cocktails }) {
                 value={newCocktail.recipe}
                 onChange={updateNewCocktail}
               />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="fileUpload">Upload Image</Label>
+              <Input type="file" id="fileUpload" name="fileUpload" className="form-control" onChange={getImage} />
             </FormGroup>
             <FormGroup row>
               <div className="col">
