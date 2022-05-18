@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardImg, CardBody, CardSubtitle, CardTitle, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
-function RenderCocktail({ cocktail }) {
+function RenderCocktail({ cocktail, deleteCocktail }) {
   const [buttonDropdownIsOpen, toggleButtonDropDown] = useState(false);
 
   return (
@@ -17,7 +17,7 @@ function RenderCocktail({ cocktail }) {
               <DropdownToggle caret />
               <DropdownMenu>
                 <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem onClick={() => deleteCocktail(cocktail)}>Delete</DropdownItem>
               </DropdownMenu>
             </ButtonDropdown>
           </div>
@@ -47,7 +47,7 @@ function CocktailInfo(props) {
     return (
       <div className="container py-3">
         <div className="row">
-          <RenderCocktail cocktail={cocktail} />
+          <RenderCocktail cocktail={cocktail} deleteCocktail={props.deleteCocktail} />
         </div>
       </div>
     );
