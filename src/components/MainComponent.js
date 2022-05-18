@@ -19,11 +19,7 @@ const Main = ({history}) => {
   // This updates the cocktail list and the remaing cocktail id necessary
   // Navigates back to the cocktail directory
   const deleteCocktail = (unwantedCocktail) => {
-    const updatedCocktailList = cocktails.filter(cocktail => cocktail.name !== unwantedCocktail.name)
-      .map(cocktail => {
-        if (cocktail.id > unwantedCocktail.id) return {...cocktail, id: cocktail.id - 1};
-        else return {...cocktail};
-      });
+    const updatedCocktailList = cocktails.filter(cocktail => cocktail.name !== unwantedCocktail.name);
     //console.log(updatedCocktailList);
     setCocktails(updatedCocktailList);
     navigate('/directory');

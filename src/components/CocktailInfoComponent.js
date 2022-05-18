@@ -39,11 +39,11 @@ function RenderCocktail({ cocktail, deleteCocktail }) {
 
 function CocktailInfo(props) {
   let { id } = useParams();
-    //console.log(id);
-  if (props.cocktails) {
-    const cocktail = props.cocktails[id];
 
-    //console.log(props.cocktail);
+  if (props.cocktails) {
+    const cocktail = props.cocktails.filter(cocktail => cocktail.id === Number(id))[0];
+
+    console.log(cocktail);
     return (
       <div className="container py-3">
         <div className="row">
