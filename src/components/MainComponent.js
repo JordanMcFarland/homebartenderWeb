@@ -7,24 +7,63 @@ import FavoriteComponent from "./FavoriteComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
 //import { COCKTAILS } from "../shared/cocktailList";
 import { INGREDIENTS } from "../shared/ingredients";
+import { postCocktail } from "../helpers/airtable";
 import { baseUrl } from "../shared/baseUrl";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(false);
   const [cocktails, setCocktails] = useState([]);
   const [ingredients] = useState(INGREDIENTS);
   const [favorites, setFavorites] = useState([]);
   let navigate = useNavigate();
 
   //fetch the cocktails
+  // useEffect(() => {
+  //   const fetchCocktails = async () => {
+  //     const response = await fetch(baseUrl + "cocktails");
+  //     const cocktailList = await response.json();
+  //     //console.log(cocktailList);
+  //     setCocktails((prevState) => [...prevState, ...cocktailList]);
+  //     setLoading(false);
+  //   };
+  //   fetchCocktails();
+  // }, []);
+
   useEffect(() => {
-    const fetchCocktails = async () => {
-      const response = await fetch(baseUrl + "cocktails");
-      const cocktailList = await response.json();
-      setCocktails(...cocktails, cocktailList);
-      setLoading(false);
+    const fetchAirTable = async () => {
+      try {
+        const response = await fetch(
+          `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/COCKTAILS`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
+            },
+          }
+        );
+        const list = await response.json();
+        const cocktailList = list.records.map((record) => {
+          const { id, name, requiredIngredients, recipe, image } =
+            record.fields;
+          const ingredientsArr = requiredIngredients.split(",");
+          return {
+            id,
+            name,
+            requiredIngredients: ingredientsArr.map((item) => item.trim()),
+            recipe,
+            image,
+          };
+        });
+        console.log(cocktailList);
+        setCocktails((prevState) => [...prevState, ...cocktailList]);
+      } catch (e) {
+        console.error(e);
+        setErr(true);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchCocktails();
+    fetchAirTable();
   }, []);
 
   useEffect(() => {
@@ -33,6 +72,14 @@ const Main = ({ history }) => {
 
   const addCocktail = (cocktail) => {
     setCocktails([...cocktails, cocktail]);
+    const formattedIngredients = cocktail.requiredIngredients.join();
+    const formattedCocktail = {
+      ...cocktail,
+      requiredIngredients: formattedIngredients,
+    };
+    console.log(formattedCocktail);
+    postCocktail(formattedCocktail);
+    navigate("/directory");
   };
 
   // This updates the cocktail list and the remaing cocktail id necessary
@@ -45,12 +92,18 @@ const Main = ({ history }) => {
     navigate("/directory");
   };
 
-  const addFavorite = (cocktailId) => {
+  const toggleFavorite = (cocktailId) => {
     if (favorites.includes(cocktailId)) {
-      setFavorites([...favorites]);
-      console.log("Cocktail is already a favorite");
+      const updatedFavorites = favorites.filter(
+        (favorite) => favorite !== cocktailId
+      );
+      setFavorites(updatedFavorites);
     } else setFavorites([...favorites, cocktailId]);
   };
+
+  if (err) {
+    return <h1>Something went wrong.</h1>;
+  }
 
   if (!loading) {
     return (
@@ -63,7 +116,8 @@ const Main = ({ history }) => {
               <CocktailInfo
                 cocktails={cocktails}
                 deleteCocktail={deleteCocktail}
-                addFavorite={addFavorite}
+                toggleFavorite={toggleFavorite}
+                favorites={favorites}
               />
             }
           />

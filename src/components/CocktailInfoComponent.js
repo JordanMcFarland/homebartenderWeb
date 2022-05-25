@@ -31,8 +31,10 @@ function RenderCocktail({ cocktail, ...props }) {
             >
               <DropdownToggle caret />
               <DropdownMenu>
-                <DropdownItem onClick={() => props.addFavorite(cocktail.id)}>
-                  Favorite
+                <DropdownItem onClick={() => props.toggleFavorite(cocktail.id)}>
+                  {props.favorites.includes(cocktail.id)
+                    ? "Unfavorite"
+                    : "Favorite"}
                 </DropdownItem>
                 <DropdownItem>Edit</DropdownItem>
                 <DropdownItem onClick={() => props.deleteCocktail(cocktail)}>
@@ -75,7 +77,8 @@ function CocktailInfo(props) {
           <RenderCocktail
             cocktail={cocktail}
             deleteCocktail={props.deleteCocktail}
-            addFavorite={props.addFavorite}
+            toggleFavorite={props.toggleFavorite}
+            favorites={props.favorites}
           />
         </div>
       </div>
