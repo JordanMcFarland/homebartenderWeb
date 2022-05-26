@@ -5,10 +5,8 @@ import CocktailCreator from "./CocktailCreatorComponent";
 import Header from "./HeaderComponent";
 import FavoriteComponent from "./FavoriteComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
-//import { COCKTAILS } from "../shared/cocktailList";
 import { INGREDIENTS } from "../shared/ingredients";
 import { postCocktail } from "../helpers/airtable";
-import { baseUrl } from "../shared/baseUrl";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
@@ -17,18 +15,6 @@ const Main = ({ history }) => {
   const [ingredients] = useState(INGREDIENTS);
   const [favorites, setFavorites] = useState([]);
   let navigate = useNavigate();
-
-  //fetch the cocktails
-  // useEffect(() => {
-  //   const fetchCocktails = async () => {
-  //     const response = await fetch(baseUrl + "cocktails");
-  //     const cocktailList = await response.json();
-  //     //console.log(cocktailList);
-  //     setCocktails((prevState) => [...prevState, ...cocktailList]);
-  //     setLoading(false);
-  //   };
-  //   fetchCocktails();
-  // }, []);
 
   useEffect(() => {
     const fetchAirTable = async () => {
@@ -118,6 +104,7 @@ const Main = ({ history }) => {
                 deleteCocktail={deleteCocktail}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
+                ingredients={ingredients}
               />
             }
           />

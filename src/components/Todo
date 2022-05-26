@@ -4,5 +4,6 @@
 [x] My Favorites
 [] Edit Cocktails
 [] Home Page
-[] Recommended Cocktail based on what you have been drinking
+[] Recommended Cocktail based on what you have been drinking -- part of homepage?
 [x] Set up temp json server
+[x] use airtable to get and post cocktails
