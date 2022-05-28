@@ -14,7 +14,7 @@ const Main = ({ history }) => {
   const [cocktails, setCocktails] = useState([]);
   const [ingredients] = useState(INGREDIENTS);
   const [favorites, setFavorites] = useState([]);
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAirTable = async () => {
@@ -87,6 +87,16 @@ const Main = ({ history }) => {
     } else setFavorites([...favorites, cocktailId]);
   };
 
+  const commitEditedCocktail = (editedCocktail) => {
+    const editedCocktailList = cocktails;
+    const index = editedCocktailList.findIndex(
+      (cocktail) => cocktail.id === editedCocktail.id
+    );
+    editedCocktailList[index] = editedCocktail;
+    //console.log(editedCocktailList);
+    setCocktails(editedCocktailList);
+  };
+
   if (err) {
     return <h1>Something went wrong.</h1>;
   }
@@ -105,6 +115,7 @@ const Main = ({ history }) => {
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
                 ingredients={ingredients}
+                commitEditedCocktail={commitEditedCocktail}
               />
             }
           />

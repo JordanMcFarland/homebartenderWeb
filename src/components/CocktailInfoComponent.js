@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Card,
   CardImg,
@@ -22,9 +22,36 @@ function RenderCocktail({ cocktail, ...props }) {
   const [editing, toggleEdit] = useState(false);
   const [editedCocktail, setEditedCocktail] = useState(cocktail);
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleIngredient = () => {
-    console.log("toggled");
+  useEffect(() => {
+    console.log(editedCocktail.requiredIngredients);
+  }, [editedCocktail.requiredIngredients]);
+
+  const updateEditedCocktail = (e) => {
+    const { name, value } = e.target;
+    setEditedCocktail({ ...editedCocktail, [name]: value });
+  };
+
+  const toggleIngredient = (ingredient) => {
+    // set this up to set the edited cocktail list
+    // the edited cocktail is now providing the props for all the components if editing is true
+    const newData = { ...editedCocktail };
+    const upperCaseIngredients = newData.requiredIngredients.map((ingredient) =>
+      ingredient.toUpperCase()
+    );
+    if (!upperCaseIngredients.includes(ingredient.toUpperCase())) {
+      newData.requiredIngredients = [
+        ...newData.requiredIngredients,
+        ingredient,
+      ];
+      console.log(ingredient + " has been added to list");
+    } else {
+      newData.requiredIngredients = newData.requiredIngredients.filter(
+        (item) => item.toUpperCase() !== ingredient.toUpperCase()
+      );
+    }
+    setEditedCocktail(newData);
   };
 
   if (!editing) {
@@ -92,7 +119,8 @@ function RenderCocktail({ cocktail, ...props }) {
                   type="text"
                   id="name"
                   name="name"
-                  defaultValue={cocktail.name}
+                  defaultValue={editedCocktail.name}
+                  onChange={updateEditedCocktail}
                 />
               </CardTitle>
             </div>
@@ -111,7 +139,7 @@ function RenderCocktail({ cocktail, ...props }) {
             </div>
           </div>
           <CardBody>
-            <CardImg src={cocktail.image} width="30"></CardImg>
+            <CardImg src={editedCocktail.image} width="30"></CardImg>
             <CardSubtitle className="mb-2 text-muted">
               Ingredients:
             </CardSubtitle>
@@ -130,7 +158,7 @@ function RenderCocktail({ cocktail, ...props }) {
                 <IngredientDirectory
                   ingredients={props.ingredients}
                   toggleIngredient={toggleIngredient}
-                  prefilledList={cocktail.requiredIngredients}
+                  prefilledList={editedCocktail.requiredIngredients}
                 />
               </Collapse>
             </div>
@@ -139,9 +167,23 @@ function RenderCocktail({ cocktail, ...props }) {
               type="textarea"
               id="recipe"
               name="recipe"
-              defaultValue={cocktail.recipe}
+              defaultValue={editedCocktail.recipe}
               rows="3"
+              onChange={updateEditedCocktail}
             />
+            <Button
+              color="primary"
+              onClick={() => {
+                props.commitEditedCocktail(editedCocktail);
+                toggleEdit(false);
+                navigate(`/directory/${props.id}`);
+              }}
+              style={{
+                margin: "1rem",
+              }}
+            >
+              Submit
+            </Button>
           </CardBody>
         </Card>
       </div>
@@ -166,6 +208,8 @@ function CocktailInfo(props) {
             toggleFavorite={props.toggleFavorite}
             favorites={props.favorites}
             ingredients={props.ingredients}
+            commitEditedCocktail={props.commitEditedCocktail}
+            id={id}
           />
         </div>
       </div>
