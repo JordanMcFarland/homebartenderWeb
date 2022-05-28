@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Card, Label, Input } from "reactstrap";
 
 function RenderIngredientItem({ ingredient, toggleIngredient, ...props }) {
+  const [isChecked, setIsChecked] = useState(
+    props.prefilledList.includes(ingredient.toLowerCase())
+  );
+
   if (props.prefilledList) {
     return (
       <Card>
@@ -9,9 +13,12 @@ function RenderIngredientItem({ ingredient, toggleIngredient, ...props }) {
           <Input
             className="mx-3"
             type="checkbox"
-            checked={props.prefilledList.includes(ingredient.toLowerCase())}
             name={ingredient}
-            onChange={(e) => toggleIngredient(e.target.name)}
+            onChange={(e) => {
+              toggleIngredient(e.target.name);
+              setIsChecked(e.target.checked);
+            }}
+            checked={isChecked}
           />
           {" " + ingredient}
         </Label>
