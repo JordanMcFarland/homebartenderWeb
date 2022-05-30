@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Card, Label, Input } from "reactstrap";
 
 function RenderIngredientItem({ ingredient, toggleIngredient, ...props }) {
-  const [isChecked, setIsChecked] = useState(
-    props.prefilledList.includes(ingredient.toLowerCase())
-  );
+  const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    if (props.prefilledList) {
+      const lowerCaseIngredients = props.prefilledList.map((ingredient) =>
+        ingredient.toLowerCase()
+      );
+      setIsChecked(lowerCaseIngredients.includes(ingredient.toLowerCase()));
+    }
+  }, []);
 
   if (props.prefilledList) {
     return (
