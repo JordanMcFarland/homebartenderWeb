@@ -1,51 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Card, Label, Input } from "reactstrap";
 
-function RenderIngredientItem({ ingredient, toggleIngredient, ...props }) {
-  const [isChecked, setIsChecked] = useState(false);
-
-  useEffect(() => {
-    if (props.prefilledList) {
-      const lowerCaseIngredients = props.prefilledList.map((ingredient) =>
-        ingredient.toLowerCase()
-      );
-      setIsChecked(lowerCaseIngredients.includes(ingredient.toLowerCase()));
-    }
-  }, []);
-
-  if (props.prefilledList) {
-    return (
-      <Card>
-        <Label className="pt-2" check>
-          <Input
-            className="mx-3"
-            type="checkbox"
-            name={ingredient}
-            onChange={(e) => {
-              toggleIngredient(e.target.name);
-              setIsChecked(e.target.checked);
-            }}
-            checked={isChecked}
-          />
-          {" " + ingredient}
-        </Label>
-      </Card>
-    );
-  } else {
-    return (
-      <Card>
-        <Label className="pt-2" check>
-          <Input
-            className="mx-3"
-            type="checkbox"
-            name={ingredient}
-            onChange={(e) => toggleIngredient(e.target.name)}
-          />
-          {" " + ingredient}
-        </Label>
-      </Card>
-    );
-  }
+function RenderIngredientItem({ ingredient, toggleIngredient, isChecked }) {
+  return (
+    <Card>
+      <Label className="pt-2" check>
+        <Input
+          className="mx-3"
+          type="checkbox"
+          name={ingredient}
+          onChange={(e) => {
+            toggleIngredient(e.target.name);
+          }}
+          checked={isChecked}
+        />
+        {" " + ingredient}
+      </Label>
+    </Card>
+  );
 }
 
 function IngredientDirectory(props) {
@@ -56,6 +28,7 @@ function IngredientDirectory(props) {
           ingredient={ingredient}
           toggleIngredient={props.toggleIngredient}
           prefilledList={props.prefilledList}
+          isChecked={props?.prefilledList?.includes(ingredient)}
         />
       </div>
     );

@@ -2,7 +2,7 @@
 
 [] My Bar
 [x] My Favorites
-[] Edit Cocktails
+[] Edit Cocktails -- still need to provide option for image edit
 [] Home Page
 [] Recommended Cocktail based on what you have been drinking -- part of homepage?
 [x] Set up temp json server
