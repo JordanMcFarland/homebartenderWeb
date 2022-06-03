@@ -36,6 +36,11 @@ const Header = () => {
                 </NavLink>
               </NavItem>
               <NavItem>
+                <NavLink className="nav-link" to="/mycocktails">
+                  My Cocktails
+                </NavLink>
+              </NavItem>
+              <NavItem>
                 <NavLink className="nav-link" to="/favorites">
                   My Favorites
                 </NavLink>

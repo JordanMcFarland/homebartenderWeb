@@ -100,20 +100,26 @@ function RenderCocktail({ cocktail, ...props }) {
                 ) : (
                   <>
                     <DropdownItem
-                      onClick={() => props.toggleFavorite(cocktail.id)}
+                      onClick={() => props.toggleFavorite(cocktail)}
                     >
-                      {props.favorites.includes(cocktail.id)
+                      {props.favorites.includes(cocktail)
                         ? "Unfavorite"
                         : "Favorite"}
                     </DropdownItem>
-                    <DropdownItem onClick={() => toggleEdit(true)}>
-                      Edit
-                    </DropdownItem>
-                    <DropdownItem
-                      onClick={() => props.deleteCocktail(cocktail)}
-                    >
-                      Delete
-                    </DropdownItem>
+                    {cocktail.userCreated ? (
+                      <>
+                        <DropdownItem onClick={() => toggleEdit(true)}>
+                          Edit
+                        </DropdownItem>
+                        <DropdownItem
+                          onClick={() => props.deleteCocktail(cocktail)}
+                        >
+                          Delete
+                        </DropdownItem>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </>
                 )}
               </DropdownMenu>
@@ -170,7 +176,7 @@ function RenderCocktail({ cocktail, ...props }) {
                 onClick={() => {
                   props.commitEditedCocktail(editedCocktail);
                   toggleEdit(false);
-                  navigate(`/directory/${props.id}`);
+                  navigate(`/mycocktails/${props.id}`);
                 }}
                 style={{
                   margin: "1rem",

@@ -14,6 +14,7 @@ const Main = ({ history }) => {
   const [cocktails, setCocktails] = useState([]);
   const [ingredients] = useState(INGREDIENTS);
   const [favorites, setFavorites] = useState([]);
+  const [myCocktails, setMyCocktails] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,49 +53,44 @@ const Main = ({ history }) => {
     fetchAirTable();
   }, []);
 
-  useEffect(() => {
-    console.log(favorites);
-  }, [favorites]);
-
-  const addCocktail = (cocktail) => {
-    setCocktails([...cocktails, cocktail]);
-    const formattedIngredients = cocktail.requiredIngredients.join();
-    const formattedCocktail = {
-      ...cocktail,
-      requiredIngredients: formattedIngredients,
-    };
-    console.log(formattedCocktail);
-    postCocktail(formattedCocktail);
-    navigate("/directory");
+  const addMyCocktail = (cocktail) => {
+    // const formattedIngredients = cocktail.requiredIngredients.join();
+    // const formattedCocktail = {
+    //   ...cocktail,
+    //   requiredIngredients: formattedIngredients,
+    // };
+    setMyCocktails((prevState) => [...prevState, cocktail]);
+    //postCocktail(formattedCocktail);  *** Need to add new airtable table to post 'my cocktail' list
+    navigate("/mycocktails");
   };
 
-  // This updates the cocktail list and the remaing cocktail id necessary
+  // This updates the  mycocktail list
   // Navigates back to the cocktail directory
   const deleteCocktail = (unwantedCocktail) => {
-    const updatedCocktailList = cocktails.filter(
+    const updatedCocktailList = myCocktails.filter(
       (cocktail) => cocktail.name !== unwantedCocktail.name
     );
-    setCocktails(updatedCocktailList);
-    navigate("/directory");
+    setMyCocktails(updatedCocktailList);
+    navigate("/mycocktails");
   };
 
-  const toggleFavorite = (cocktailId) => {
-    if (favorites.includes(cocktailId)) {
+  const toggleFavorite = (cocktail) => {
+    if (favorites.includes(cocktail)) {
       const updatedFavorites = favorites.filter(
-        (favorite) => favorite !== cocktailId
+        (favorite) => favorite !== cocktail
       );
       setFavorites(updatedFavorites);
-    } else setFavorites([...favorites, cocktailId]);
+    } else setFavorites([...favorites, cocktail]);
   };
 
   const commitEditedCocktail = (editedCocktail) => {
-    const editedCocktailList = cocktails;
+    const editedCocktailList = myCocktails;
     const index = editedCocktailList.findIndex(
       (cocktail) => cocktail.id === editedCocktail.id
     );
     editedCocktailList[index] = editedCocktail;
     //console.log(editedCocktailList);
-    setCocktails(editedCocktailList);
+    setMyCocktails(editedCocktailList);
   };
 
   if (err) {
@@ -111,6 +107,17 @@ const Main = ({ history }) => {
             element={
               <CocktailInfo
                 cocktails={cocktails}
+                toggleFavorite={toggleFavorite}
+                favorites={favorites}
+                ingredients={ingredients}
+              />
+            }
+          />
+          <Route
+            path="/mycocktails/:id"
+            element={
+              <CocktailInfo
+                cocktails={myCocktails}
                 deleteCocktail={deleteCocktail}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
@@ -120,16 +127,29 @@ const Main = ({ history }) => {
             }
           />
           <Route
+            key="directory"
             path="/directory"
-            element={<CocktailDirectory cocktails={cocktails} />}
+            element={
+              <CocktailDirectory cocktails={cocktails} location="directory" />
+            }
           />
           <Route
             path="/cocktailcreator"
             element={
               <CocktailCreator
                 ingredients={ingredients}
-                cocktails={cocktails}
-                addCocktail={addCocktail}
+                myCocktails={myCocktails}
+                addMyCocktail={addMyCocktail}
+              />
+            }
+          />
+          <Route
+            key="mycocktails"
+            path="/mycocktails"
+            element={
+              <CocktailDirectory
+                cocktails={myCocktails}
+                location="mycocktails"
               />
             }
           />

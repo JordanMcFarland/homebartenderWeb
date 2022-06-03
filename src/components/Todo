@@ -7,3 +7,5 @@
 [] Recommended Cocktail based on what you have been drinking -- part of homepage?
 [x] Set up temp json server
 [x] use airtable to get and post cocktails
+
+[] If you add a user cocktail to favorites then delete it, it remains in the favorites list -- needs fixed or reworked

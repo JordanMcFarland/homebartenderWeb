@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardImg, CardImgOverlay, CardTitle, Button } from "reactstrap";
+import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 
-function RenderDirectoryItem({ cocktail }) {
+function RenderDirectoryItem({ cocktail, ...props }) {
   return (
-    <Card>
-      <Link to={`/directory/${cocktail.id}`}>
-        <CardImg src={cocktail.image} alt={cocktail.name} width="30"></CardImg>
+    <Card style={{ minHeight: 60 }}>
+      <Link
+        to={`/${props.location === "directory" ? "directory" : "mycocktails"}/${
+          cocktail.id
+        }`}
+      >
+        {cocktail.image ? (
+          <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
+        ) : (
+          <div />
+        )}
         <CardImgOverlay>
           <CardTitle>{cocktail.name}</CardTitle>
         </CardImgOverlay>
@@ -30,10 +38,14 @@ function CocktailDirectory(props) {
     // console.log(searchBy);
   }, [searchTerm]);
 
+  useEffect(() => {
+    setCocktailDirectory(props.cocktails);
+  }, [props.location]);
+
   const directory = cocktailDirectory.map((cocktail) => {
     return (
       <div key={cocktail.id} className="col-md-5 m-1">
-        <RenderDirectoryItem cocktail={cocktail} />
+        <RenderDirectoryItem cocktail={cocktail} location={props.location} />
       </div>
     );
   });
@@ -102,21 +114,29 @@ function CocktailDirectory(props) {
     // }));
   };
 
-  return (
-    <div className="container py-3">
-      <input
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search"
-      />{" "}
-      <select id="searchBy" onChange={(e) => setSearchBy(e.target.value)}>
-        <option value="byName">By Name</option>
-        <option value="byIngredients">By Ingredients</option>
-      </select>
-      {/*<Button onClick={searchByName}>Search</Button> */}
-      <div className="row">{directory}</div>
-    </div>
-  );
+  if (!props.cocktails && props.location === "mycocktails") {
+    return <div>You have not added any cocktails.</div>;
+  } else {
+    return (
+      <div className="container py-3">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search"
+        />{" "}
+        <select id="searchBy" onChange={(e) => setSearchBy(e.target.value)}>
+          <option value="byName">By Name</option>
+          <option value="byIngredients">By Ingredients</option>
+        </select>
+        {/*<Button onClick={searchByName}>Search</Button> */}
+        <div className="row">
+          {props.location === "mycocktails" && cocktailDirectory.length <= 0
+            ? "You have not added any cocktails."
+            : directory}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default CocktailDirectory;

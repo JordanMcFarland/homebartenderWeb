@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
 import { Form, FormGroup, Button, Collapse, Label, Input } from "reactstrap";
 
-function CocktailCreator({ ingredients, addCocktail, cocktails }) {
+function CocktailCreator({ ingredients, addMyCocktail, myCocktails }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
   const [newCocktail, setNewCocktail] = useState({
     id: null,
@@ -10,6 +10,7 @@ function CocktailCreator({ ingredients, addCocktail, cocktails }) {
     requiredIngredients: [],
     recipe: "",
     image: "",
+    userCreated: true,
   });
 
   const toggleIngredients = () => setIsOpenIngredients(!isOpenIngredients);
@@ -36,8 +37,8 @@ function CocktailCreator({ ingredients, addCocktail, cocktails }) {
   };
 
   const commitCocktail = (e) => {
-    newCocktail.id = cocktails.length;
-    addCocktail(newCocktail);
+    newCocktail.id = myCocktails.length;
+    addMyCocktail(newCocktail);
     alert(newCocktail.name + " has been added to the cocktail list.");
     e.preventDefault();
   };
