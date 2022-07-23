@@ -49,32 +49,29 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
     const craftableList = [];
     const lowerCaseMyBar = myBar.map((ingredient) => ingredient.toLowerCase());
     cocktails.forEach((cocktail) => {
-      let ingredientCounter = 0;
-      let lowerCaseIngredientList = cocktail.requiredIngredients.map(
-        (ingredient) => ingredient.toLowerCase()
+      let trimmedIngredientList = cocktail.requiredIngredients.map(
+        (ingredient) =>
+          ingredient
+            .replace(
+              /[0-9]|\.|[0-9]* (ozs|oz|dashes|dash|tsp)|\([^)]*\)|[/]/g,
+              ""
+            )
+            .trim()
+            .toLowerCase()
       );
-      lowerCaseIngredientList.forEach((ingredient) => {
-        lowerCaseMyBar.forEach((item) => {
-          if (ingredient.includes(item)) {
-            ingredientCounter++; //counts twice sometimes - ex. gin and london dry gin
-            console.log(ingredientCounter + " - " + item + " counted");
-          }
-        });
-      });
       if (
-        ingredientCounter >= cocktail.requiredIngredients.length &&
-        !craftableList.includes(cocktail)
+        trimmedIngredientList.every((ingredient) =>
+          lowerCaseMyBar.includes(ingredient)
+        )
       ) {
         craftableList.push(cocktail);
       }
-      console.log(cocktail.name + " - " + cocktail.requiredIngredients.length);
-      console.log("Counter Total: " + ingredientCounter);
+      console.log(cocktail.name);
+      console.log(trimmedIngredientList);
     });
     console.log(craftableList);
     return craftableList;
   }
-
-  //const renderCraftableCocktails = console.log(getCraftableList());
 
   return (
     <div className="container">

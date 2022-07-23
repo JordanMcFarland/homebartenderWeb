@@ -19,20 +19,20 @@ Backend Stuff
 --[x] Create airtable table that contains some ingredients for testing
 --[x] Create route to my bar
 --[] Create ui for my bar
---[] Separate ingredients by type
---[x] Each will be on a card
---[x] Checkboxes
---[x] Label for ingredient
---[] Picture (optional and might be too cluttered)
+----[] Separate ingredients by type
+----[x] Each will be on a card
+----[x] Checkboxes
+----[x] Label for ingredient
+----[] Picture (optional and might be too cluttered)
 --[] Functionality
---[x] Create my bar list
---[x] Checked/unchecked ingredients should update my bar list
---[] Display cocktails user can make based on my bar list
---[] Loop through all cocktails to check if my bar includes all ingredients
---[] Check to see if each specific string is included somewhere in the cocktail list
---[] 'Craftable' list is created based on the ingredient check
---[x] Include cocktails in my bar props
---[] reuse code from cocktail directory to display craftable cocktails?
+----[x] Create my bar list
+----[x] Checked/unchecked ingredients should update my bar list
+----[] Display cocktails user can make based on my bar list
+----[x] Loop through all cocktails to check if my bar includes all ingredients
+----[x] Check to see if each specific string is included somewhere in the cocktail list
+----[x] 'Craftable' list is created based on the ingredient check
+----[x] Include cocktails in my bar props
+----[] reuse code from cocktail directory to display craftable cocktails?
 
 \*\*Cocktail Directory
 --[] Display a specific amount of cocktails per page
