@@ -8,13 +8,13 @@ function RenderIngredientItem({ ingredient, toggleIngredient, isChecked }) {
         <Input
           className="mx-3"
           type="checkbox"
-          name={ingredient}
+          name={ingredient.name}
           onChange={(e) => {
             toggleIngredient(e.target.name);
           }}
           checked={isChecked}
         />
-        {" " + ingredient}
+        {" " + ingredient.name}
       </Label>
     </Card>
   );

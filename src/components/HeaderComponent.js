@@ -45,6 +45,11 @@ const Header = () => {
                   My Favorites
                 </NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink className="nav-link" to="/mybar">
+                  My Bar
+                </NavLink>
+              </NavItem>
             </Nav>
           </Collapse>
         </div>

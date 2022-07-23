@@ -4,6 +4,7 @@ import CocktailInfo from "./CocktailInfoComponent";
 import CocktailCreator from "./CocktailCreatorComponent";
 import Header from "./HeaderComponent";
 import FavoriteComponent from "./FavoriteComponent";
+import MyBarComponent from "./MyBarComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { INGREDIENTS } from "../shared/ingredients";
 import { postCocktail } from "../helpers/airtable";
@@ -12,13 +13,14 @@ const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(false);
   const [cocktails, setCocktails] = useState([]);
-  const [ingredients] = useState(INGREDIENTS);
+  const [ingredients, setIngredients] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [myCocktails, setMyCocktails] = useState([]);
+  const [myBar, setMyBar] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchAirTable = async () => {
+    const fetchCocktailAirTable = async () => {
       try {
         const response = await fetch(
           `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/COCKTAILS`,
@@ -50,7 +52,38 @@ const Main = ({ history }) => {
         setLoading(false);
       }
     };
-    fetchAirTable();
+    fetchCocktailAirTable();
+  }, []);
+
+  useEffect(() => {
+    const fetchIngredientAirTable = async () => {
+      try {
+        const response = await fetch(
+          `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/INGREDIENTS`,
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
+            },
+          }
+        );
+        const list = await response.json();
+        const ingredientList = list.records.map((record) => {
+          const { name, type } = record.fields;
+          return {
+            name,
+            type,
+          };
+        });
+        console.log(ingredientList);
+        setIngredients((prevState) => [...prevState, ...ingredientList]);
+      } catch (e) {
+        console.error(e);
+        setErr(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchIngredientAirTable();
   }, []);
 
   const addMyCocktail = (cocktail) => {
@@ -154,9 +187,20 @@ const Main = ({ history }) => {
             }
           />
           <Route
-            path="favorites"
+            path="/favorites"
             element={
               <FavoriteComponent favorites={favorites} cocktails={cocktails} />
+            }
+          />
+          <Route
+            path="/mybar"
+            element={
+              <MyBarComponent
+                ingredients={ingredients}
+                cocktails={cocktails}
+                myBar={myBar}
+                setMyBar={setMyBar}
+              />
             }
           />
         </Routes>
