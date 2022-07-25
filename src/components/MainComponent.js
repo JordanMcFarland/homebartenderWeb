@@ -17,6 +17,7 @@ const Main = ({ history }) => {
   const [favorites, setFavorites] = useState([]);
   const [myCocktails, setMyCocktails] = useState([]);
   const [myBar, setMyBar] = useState([]);
+  const [sortedIngredients, setSortedIngredients] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const Main = ({ history }) => {
             image,
           };
         });
-        console.log(cocktailList);
+        //console.log(cocktailList);
         setCocktails((prevState) => [...prevState, ...cocktailList]);
       } catch (e) {
         console.error(e);
@@ -67,6 +68,7 @@ const Main = ({ history }) => {
           }
         );
         const list = await response.json();
+        // Get unsorted ingredients list
         const ingredientList = list.records.map((record) => {
           const { name, type } = record.fields;
           return {
@@ -76,6 +78,36 @@ const Main = ({ history }) => {
         });
         console.log(ingredientList);
         setIngredients((prevState) => [...prevState, ...ingredientList]);
+
+        // Get sorted ingredient list
+        const typeList = [];
+        list.records.forEach((record) => {
+          if (!typeList.includes(record.fields.type)) {
+            typeList.push(record.fields.type);
+          }
+        });
+        const sortedIngredientArray = [];
+        typeList.forEach((type) => {
+          const newTypeArr = list.records
+            .filter((record) => record.fields.type === type)
+            .map((record) => {
+              const { name, type } = record.fields;
+              return {
+                name,
+                type,
+              };
+            })
+            .sort((a, b) => (a.name > b.name ? 1 : -1));
+          sortedIngredientArray.push({
+            name: type,
+            ingredients: newTypeArr,
+          });
+        });
+        console.log(sortedIngredientArray);
+        setSortedIngredients((prevState) => [
+          ...prevState,
+          ...sortedIngredientArray,
+        ]);
       } catch (e) {
         console.error(e);
         setErr(true);
@@ -196,7 +228,7 @@ const Main = ({ history }) => {
             path="/mybar"
             element={
               <MyBarComponent
-                ingredients={ingredients}
+                ingredients={sortedIngredients}
                 cocktails={cocktails}
                 myBar={myBar}
                 setMyBar={setMyBar}
