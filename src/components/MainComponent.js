@@ -5,6 +5,7 @@ import CocktailCreator from "./CocktailCreatorComponent";
 import Header from "./HeaderComponent";
 import FavoriteComponent from "./FavoriteComponent";
 import MyBarComponent from "./MyBarComponent";
+import LoginComponent from "./LoginComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { postCocktail } from "../helpers/airtable";
 
@@ -236,6 +237,7 @@ const Main = ({ history }) => {
               />
             }
           />
+          <Route path="/login" element={<LoginComponent />} />
         </Routes>
       </>
     );

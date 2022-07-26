@@ -54,7 +54,7 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
                 return (
                   <div
                     key={index}
-                    className="col-6 col-md-4 col-lg-3 col-xxl-2 px-2 my-1"
+                    className="col-6 col-md-4 col-lg-3 px-2 my-1"
                   >
                     <Card className="p-2">{ingredient.name}</Card>
                   </div>

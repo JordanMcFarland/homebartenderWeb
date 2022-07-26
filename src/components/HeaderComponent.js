@@ -50,6 +50,11 @@ const Header = () => {
                   My Bar
                 </NavLink>
               </NavItem>
+              <NavItem>
+                <NavLink className="nav-link" to="/login">
+                  Login
+                </NavLink>
+              </NavItem>
             </Nav>
           </Collapse>
         </div>
