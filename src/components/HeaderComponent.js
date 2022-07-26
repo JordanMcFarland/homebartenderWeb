@@ -11,11 +11,11 @@ const Header = () => {
 
   return (
     <>
-      <div className="bg-light p-5 rounded-lg m-3" fluid="true">
+      <div className="bg-dark p-5" fluid="true">
         <div className="container">
           <div className="row">
             <div className="col">
-              <h1>Cocktails!</h1>
+              <h1 style={{ color: "#B70D29" }}>Home Bartender</h1>
             </div>
           </div>
         </div>

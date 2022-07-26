@@ -44,3 +44,7 @@ Backend Stuff
 
 \*\*Cocktail Editor
 --[] Edit Cocktails -- still need to provide option for image edit
+
+\*\*User Profile
+--[] Add ability to log in
+--[] Store user cocktail list

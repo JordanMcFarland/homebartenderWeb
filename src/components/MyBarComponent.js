@@ -14,7 +14,6 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   const [displayCraftable, toggleDisplayCraftable] = useState(false);
   const [editingMyBar, toggleEditMyBar] = useState(false);
   const [craftableCocktailList, setCraftableList] = useState([]);
-  const [sortedMyBarIngredients, setSortedMyBarIngredients] = useState([]);
 
   // Add/Remove ingredients from myBar
   const toggleIngredient = (ingredient) => {
@@ -28,33 +27,63 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   };
 
   // Create the cards for each ingredient item that is in myBar
-  const myBarList = myBar.map((ingredient, index) => {
-    return (
-      <div key={index} className="col-2 my-1">
-        <Card style={{ width: 100 }}>
-          <Label className="pt-2 mx-auto" check>
-            {" " + ingredient}
-          </Label>
-        </Card>
-      </div>
-    );
+  // const myBarList = myBar.map((ingredient, index) => {
+  //   return (
+  //     <div className="col" key={index}>
+  //       {ingredient}
+  //     </div>
+  //   );
+  // });
+
+  const myBarList = ingredients.map((ingredientType, index) => {
+    if (
+      ingredientType.ingredients.some((ingredient) =>
+        myBar.includes(ingredient.name)
+      )
+    ) {
+      return (
+        <div key={index} className="mt-3">
+          <h3>{ingredientType.name}</h3>
+          <div className="row mx-auto">
+            {ingredientType.ingredients.map((ingredient, index) => {
+              if (
+                myBar
+                  .map((ingredient) => ingredient.toLowerCase())
+                  .includes(ingredient.name.toLowerCase())
+              ) {
+                return (
+                  <div
+                    key={index}
+                    className="col-6 col-md-4 col-lg-3 col-xxl-2 px-2 my-1"
+                  >
+                    <Card className="p-2">{ingredient.name}</Card>
+                  </div>
+                );
+              }
+            })}
+          </div>
+        </div>
+      );
+    }
   });
 
   // Render the cards for adding ingredient to myBar
   const renderIngredientList = ingredients.map((ingredientType, index) => {
     return (
-      <div key={index} className="mt-4">
+      <div key={index} className="mt-3">
         <h3>{ingredientType.name}</h3>
-        <div className="row">
+        <div className="row mx-auto">
           {ingredientType.ingredients.map((ingredient, index) => {
             return (
-              <div className="col-4 mt-1" key={index}>
+              <div className="col-6 col-md-4 col-lg-3 px-2 my-1" key={index}>
                 <Card>
                   <Label className="pt-2 mx-3" check>
                     <Input
                       type="checkbox"
                       name={ingredient.name}
-                      onChange={(e) => toggleIngredient(e.target.name)}
+                      onChange={(e) => {
+                        toggleIngredient(e.target.name);
+                      }}
                       checked={myBar.includes(ingredient.name)}
                     />
                     {" " + ingredient.name}
@@ -96,7 +125,7 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   const renderCraftableCocktails = craftableCocktailList.length ? (
     craftableCocktailList.map((cocktail) => {
       return (
-        <div className="col-6" key={cocktail.id}>
+        <div className="col-md-6 my-1" key={cocktail.id}>
           <Card style={{ minHeight: 60 }}>
             <Link to={`/directory/${cocktail.id}`}>
               {cocktail.image ? (
@@ -113,15 +142,17 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
       );
     })
   ) : (
-    <div className="col">You have no ingredients in your bar</div>
+    <div className="col">
+      You cannot make any cocktails based on your ingredients
+    </div>
   );
 
   return (
-    <div className="container">
+    <div className="container my-2">
       <div className="row">
         <Button
           className="col m-1"
-          color="primary"
+          style={{ background: "#B70D29" }}
           onClick={() => {
             if (!displayCraftable) {
               getCraftableList();
@@ -143,8 +174,10 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
             </Button> */}
             <Button
               className="col m-1"
-              onClick={() => toggleEditMyBar(!editingMyBar)}
-              color="warning"
+              onClick={() => {
+                toggleEditMyBar(!editingMyBar);
+              }}
+              color="secondary"
             >
               {editingMyBar ? "Submit" : "Edit My Bar"}
             </Button>

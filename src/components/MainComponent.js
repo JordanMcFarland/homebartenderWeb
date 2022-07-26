@@ -6,7 +6,6 @@ import Header from "./HeaderComponent";
 import FavoriteComponent from "./FavoriteComponent";
 import MyBarComponent from "./MyBarComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { INGREDIENTS } from "../shared/ingredients";
 import { postCocktail } from "../helpers/airtable";
 
 const Main = ({ history }) => {
@@ -32,18 +31,20 @@ const Main = ({ history }) => {
           }
         );
         const list = await response.json();
-        const cocktailList = list.records.map((record) => {
-          const { id, name, requiredIngredients, recipe, image } =
-            record.fields;
-          const ingredientsArr = requiredIngredients.split(",");
-          return {
-            id,
-            name,
-            requiredIngredients: ingredientsArr.map((item) => item.trim()),
-            recipe,
-            image,
-          };
-        });
+        const cocktailList = list.records
+          .map((record) => {
+            const { id, name, requiredIngredients, recipe, image } =
+              record.fields;
+            const ingredientsArr = requiredIngredients.split(",");
+            return {
+              id,
+              name,
+              requiredIngredients: ingredientsArr.map((item) => item.trim()),
+              recipe,
+              image,
+            };
+          })
+          .sort((a, b) => (a.name > b.name ? 1 : -1));
         //console.log(cocktailList);
         setCocktails((prevState) => [...prevState, ...cocktailList]);
       } catch (e) {
