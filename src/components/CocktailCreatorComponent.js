@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
 import { Form, FormGroup, Button, Collapse, Label, Input } from "reactstrap";
 
-function CocktailCreator({ ingredients, addMyCocktail, myCocktails }) {
+function CocktailCreator({
+  ingredients,
+  ingredientCategories,
+  addMyCocktail,
+  myCocktails,
+}) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
   const [newCocktail, setNewCocktail] = useState({
     id: null,
@@ -86,6 +91,7 @@ function CocktailCreator({ ingredients, addMyCocktail, myCocktails }) {
                   <IngredientDirectory
                     ingredients={ingredients}
                     toggleIngredient={toggleIngredient}
+                    ingredientCategories={ingredientCategories}
                   />
                 </Collapse>
               </div>

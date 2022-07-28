@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Label,
@@ -10,10 +10,20 @@ import {
 } from "reactstrap";
 import { Link } from "react-router-dom";
 
-function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
+function MyBarComponent({
+  ingredients,
+  ingredientCategories,
+  cocktails,
+  myBar,
+  setMyBar,
+}) {
   const [displayCraftable, toggleDisplayCraftable] = useState(false);
   const [editingMyBar, toggleEditMyBar] = useState(false);
-  const [craftableCocktailList, setCraftableList] = useState([]);
+  const [craftableList, setCraftableList] = useState([]);
+
+  useEffect(() => {
+    console.log(ingredients);
+  }, []);
 
   // Add/Remove ingredients from myBar
   const toggleIngredient = (ingredient) => {
@@ -27,36 +37,22 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   };
 
   // Create the cards for each ingredient item that is in myBar
-  // const myBarList = myBar.map((ingredient, index) => {
-  //   return (
-  //     <div className="col" key={index}>
-  //       {ingredient}
-  //     </div>
-  //   );
-  // });
-
-  const myBarList = ingredients.map((ingredientType, index) => {
+  const myBarList = ingredientCategories.map((category, index) => {
     if (
-      ingredientType.ingredients.some((ingredient) =>
-        myBar.includes(ingredient.name)
-      )
+      ingredients[category].some((ingredient) => myBar.includes(ingredient))
     ) {
       return (
         <div key={index} className="mt-3">
-          <h3>{ingredientType.name}</h3>
+          <h3>{category}</h3>
           <div className="row mx-auto">
-            {ingredientType.ingredients.map((ingredient, index) => {
-              if (
-                myBar
-                  .map((ingredient) => ingredient.toLowerCase())
-                  .includes(ingredient.name.toLowerCase())
-              ) {
+            {ingredients[category].map((ingredient, index) => {
+              if (myBar.includes(ingredient)) {
                 return (
                   <div
                     key={index}
                     className="col-6 col-md-4 col-lg-3 px-2 my-1"
                   >
-                    <Card className="p-2">{ingredient.name}</Card>
+                    <Card className="p-2">{ingredient}</Card>
                   </div>
                 );
               }
@@ -68,25 +64,25 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   });
 
   // Render the cards for adding ingredient to myBar
-  const renderIngredientList = ingredients.map((ingredientType, index) => {
+  const renderIngredientList = ingredientCategories.map((category, index) => {
     return (
       <div key={index} className="mt-3">
-        <h3>{ingredientType.name}</h3>
+        <h3>{category}</h3>
         <div className="row mx-auto">
-          {ingredientType.ingredients.map((ingredient, index) => {
+          {ingredients[category].map((ingredient, index) => {
             return (
               <div className="col-6 col-md-4 col-lg-3 px-2 my-1" key={index}>
                 <Card>
                   <Label className="pt-2 mx-3" check>
                     <Input
                       type="checkbox"
-                      name={ingredient.name}
+                      name={ingredient}
                       onChange={(e) => {
                         toggleIngredient(e.target.name);
                       }}
-                      checked={myBar.includes(ingredient.name)}
+                      checked={myBar.includes(ingredient)}
                     />
-                    {" " + ingredient.name}
+                    {" " + ingredient}
                   </Label>
                 </Card>
               </div>
@@ -100,7 +96,7 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
   // Returns a list of cocktails that the user can create based on what is in myBar
   function getCraftableList() {
     const regex = /[0-9]*\.*[0-9]* (ozs|oz|dashes|dash)|\([^)]*\)/g;
-    const craftableList = [];
+    const craftableCocktailList = [];
     const lowerCaseMyBar = myBar.map((ingredient) => ingredient.toLowerCase());
     cocktails.forEach((cocktail) => {
       let trimmedIngredientList = cocktail.requiredIngredients.map(
@@ -111,19 +107,19 @@ function MyBarComponent({ ingredients, cocktails, myBar, setMyBar }) {
           lowerCaseMyBar.includes(ingredient)
         )
       ) {
-        craftableList.push(cocktail);
+        craftableCocktailList.push(cocktail);
       }
       // console.log(cocktail.name);
       // console.log(trimmedIngredientList);
     });
     //console.log(craftableList);
-    setCraftableList(craftableList);
+    setCraftableList(craftableCocktailList);
   }
 
   // Displays cards for craftable cocktails
   // *if craftable list not empty, show cocktails, else say the list is empty
-  const renderCraftableCocktails = craftableCocktailList.length ? (
-    craftableCocktailList.map((cocktail) => {
+  const renderCraftableCocktails = craftableList.length ? (
+    craftableList.map((cocktail) => {
       return (
         <div className="col-md-6 my-1" key={cocktail.id}>
           <Card style={{ minHeight: 60 }}>

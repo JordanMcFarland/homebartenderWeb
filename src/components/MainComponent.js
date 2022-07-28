@@ -7,17 +7,17 @@ import FavoriteComponent from "./FavoriteComponent";
 import MyBarComponent from "./MyBarComponent";
 import LoginComponent from "./LoginComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { postCocktail } from "../helpers/airtable";
+import { fetchIngredients, postCocktail } from "../helpers/airtable";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(false);
   const [cocktails, setCocktails] = useState([]);
-  const [ingredients, setIngredients] = useState([]);
+  const [ingredients, setIngredients] = useState({});
+  const [ingredientCategories, setIngredientCategories] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [myCocktails, setMyCocktails] = useState([]);
   const [myBar, setMyBar] = useState([]);
-  const [sortedIngredients, setSortedIngredients] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,55 +61,29 @@ const Main = ({ history }) => {
   useEffect(() => {
     const fetchIngredientAirTable = async () => {
       try {
-        const response = await fetch(
-          `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/INGREDIENTS`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
-            },
-          }
-        );
-        const list = await response.json();
-        // Get unsorted ingredients list
-        const ingredientList = list.records.map((record) => {
-          const { name, type } = record.fields;
-          return {
-            name,
-            type,
-          };
-        });
-        console.log(ingredientList);
-        setIngredients((prevState) => [...prevState, ...ingredientList]);
+        const list = await fetchIngredients();
 
-        // Get sorted ingredient list
-        const typeList = [];
+        // Create a list object with {category: ingredient array} pairs
+        const listObj = {};
         list.records.forEach((record) => {
-          if (!typeList.includes(record.fields.type)) {
-            typeList.push(record.fields.type);
+          const { type, name } = record.fields;
+
+          if (!listObj[type]) {
+            listObj[type] = [];
           }
+
+          listObj[type] = [...listObj[type], name];
         });
-        const sortedIngredientArray = [];
-        typeList.forEach((type) => {
-          const newTypeArr = list.records
-            .filter((record) => record.fields.type === type)
-            .map((record) => {
-              const { name, type } = record.fields;
-              return {
-                name,
-                type,
-              };
-            })
-            .sort((a, b) => (a.name > b.name ? 1 : -1));
-          sortedIngredientArray.push({
-            name: type,
-            ingredients: newTypeArr,
-          });
+
+        // Create category array and sort ingredients in each category
+        const keyArr = Object.keys(listObj);
+        keyArr.forEach((key) => {
+          listObj[key] = listObj[key].sort();
         });
-        console.log(sortedIngredientArray);
-        setSortedIngredients((prevState) => [
-          ...prevState,
-          ...sortedIngredientArray,
-        ]);
+
+        // Set ingredient & ingredient category state
+        setIngredients((prevState) => ({ ...prevState, ...listObj }));
+        setIngredientCategories((prevState) => [...prevState, ...keyArr]);
       } catch (e) {
         console.error(e);
         setErr(true);
@@ -205,6 +179,7 @@ const Main = ({ history }) => {
             element={
               <CocktailCreator
                 ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
                 myCocktails={myCocktails}
                 addMyCocktail={addMyCocktail}
               />
@@ -230,7 +205,8 @@ const Main = ({ history }) => {
             path="/mybar"
             element={
               <MyBarComponent
-                ingredients={sortedIngredients}
+                ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
                 cocktails={cocktails}
                 myBar={myBar}
                 setMyBar={setMyBar}
