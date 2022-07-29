@@ -95,13 +95,8 @@ const Main = ({ history }) => {
   }, []);
 
   const addMyCocktail = (cocktail) => {
-    // const formattedIngredients = cocktail.requiredIngredients.join();
-    // const formattedCocktail = {
-    //   ...cocktail,
-    //   requiredIngredients: formattedIngredients,
-    // };
     setMyCocktails((prevState) => [...prevState, cocktail]);
-    //postCocktail(formattedCocktail);  *** Need to add new airtable table to post 'my cocktail' list
+    //postCocktail(formattedCocktail);  *** Need to add new airtable table to post 'my cocktail' list unique to each user
     navigate("/mycocktails");
   };
 
@@ -109,9 +104,18 @@ const Main = ({ history }) => {
   // Navigates back to the cocktail directory
   const deleteCocktail = (unwantedCocktail) => {
     const updatedCocktailList = myCocktails.filter(
-      (cocktail) => cocktail.name !== unwantedCocktail.name
+      (cocktail) => cocktail.id !== unwantedCocktail.id
     );
+    console.log(unwantedCocktail);
     setMyCocktails(updatedCocktailList);
+    // Also check if cockails is in favorites list and delete it there
+    const updatedFavoritesList = favorites.filter(
+      (cocktail) =>
+        cocktail.id !== unwantedCocktail.id &&
+        cocktail.name !== unwantedCocktail.name
+    );
+    console.log("Favorites is updated: " + updatedFavoritesList);
+    setFavorites(updatedFavoritesList);
     navigate("/mycocktails");
   };
 
@@ -130,7 +134,6 @@ const Main = ({ history }) => {
       (cocktail) => cocktail.id === editedCocktail.id
     );
     editedCocktailList[index] = editedCocktail;
-    //console.log(editedCocktailList);
     setMyCocktails(editedCocktailList);
   };
 
@@ -163,6 +166,7 @@ const Main = ({ history }) => {
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
                 ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
                 commitEditedCocktail={commitEditedCocktail}
               />
             }

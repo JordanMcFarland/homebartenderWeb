@@ -77,15 +77,16 @@ function CocktailCreator({
             </FormGroup>
             <FormGroup row>
               <div className="col">
-                <Label>Required Ingredients</Label>{" "}
+                <Label>Required Ingredient:</Label>{" "}
                 <Button
+                  className="my-auto py-0"
                   color="secondary"
                   onClick={toggleIngredients}
                   style={{
                     marginBottom: "1rem",
                   }}
                 >
-                  Toggle Ingredients
+                  Toggle Ingredient List
                 </Button>
                 <Collapse isOpen={isOpenIngredients}>
                   <IngredientDirectory

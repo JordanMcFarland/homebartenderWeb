@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, Label, Input } from "reactstrap";
 
 function RenderIngredientItem({ ingredient, toggleIngredient, isChecked }) {
   return (
-    <Card className="col-6 col-md-4 col-lg-3 my-1">
+    <Card>
       <Label className="pt-2" check>
         <Input
           className="mx-3"
@@ -23,21 +23,26 @@ function RenderIngredientItem({ ingredient, toggleIngredient, isChecked }) {
 function IngredientDirectory(props) {
   const directory = props.ingredientCategories.map((category, index) => {
     return (
-      <div key={index}>
-        <h4>{category}</h4>
-        {props.ingredients[category].map((ingredient, index) => {
-          return (
-            <div key={index}>
-              <RenderIngredientItem
-                ingredient={ingredient}
-                toggleIngredient={props.toggleIngredient}
-                prefilledList={props.prefilledList}
-                isChecked={props?.prefilledList?.includes(ingredient)}
-                index={index}
-              />
-            </div>
-          );
-        })}
+      <div key={index} className="mt-3">
+        <h3>{category}</h3>
+        <div className="row mx-auto">
+          {props.ingredients[category].map((ingredient, index) => {
+            return (
+              <div
+                key={index}
+                className="col-12 col-sm-6 col-lg-4 col-xl-3 p-1"
+              >
+                <RenderIngredientItem
+                  ingredient={ingredient}
+                  toggleIngredient={props.toggleIngredient}
+                  prefilledList={props.prefilledList}
+                  isChecked={props?.prefilledList?.includes(ingredient)}
+                  index={index}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   });

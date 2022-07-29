@@ -60,33 +60,36 @@ function RenderCocktail({ cocktail, ...props }) {
     setEditedCocktail(newData);
   };
 
-  // if (!editing) {
   return (
-    <div className="col-lg-7 col-md-9 mx-auto">
-      <Card>
-        <div className="row pt-2 mx-3">
-          <div className="col-8 offset-2">
-            <CardTitle className="d-flex justify-content-center">
-              {editing ? (
-                <>
-                  <Label htmlFor="name">Cocktail Name: </Label>
-                  <Input
-                    type="text"
-                    id="name"
-                    name="name"
-                    defaultValue={editedCocktail.name}
-                    onChange={(e) => {
-                      updateEditedCocktail(e);
-                      console.log(cocktail.name);
-                    }}
-                  />
-                </>
-              ) : (
-                cocktail.name
-              )}
-            </CardTitle>
-          </div>
-          <div className="col-1 offset-1">
+    <div className={editing ? "col-12" : "col-lg-7 col-md-9 mx-auto"}>
+      <Card
+        style={
+          editing
+            ? { backgroundColor: "#262626" }
+            : { backgroundColor: "#810D21" }
+        }
+      >
+        <div className="row pt-2 px-1 mx-3">
+          <CardTitle className="col-11">
+            {editing ? (
+              <>
+                <Label htmlFor="name">Cocktail Name: </Label>
+                <Input
+                  type="text"
+                  id="name"
+                  name="name"
+                  defaultValue={editedCocktail.name}
+                  onChange={(e) => {
+                    updateEditedCocktail(e);
+                    console.log(cocktail.name);
+                  }}
+                />
+              </>
+            ) : (
+              cocktail.name
+            )}
+          </CardTitle>
+          <div className="col-1">
             <ButtonDropdown
               isOpen={buttonDropdownIsOpen}
               toggle={() => toggleButtonDropDown(!buttonDropdownIsOpen)}
@@ -126,13 +129,16 @@ function RenderCocktail({ cocktail, ...props }) {
             </ButtonDropdown>
           </div>
         </div>
-        <CardBody>
+        <CardBody className="mx-3">
           <CardImg src={cocktail.image} width="30"></CardImg>
-          <CardSubtitle className="mb-2 text-muted">Ingredients:</CardSubtitle>
+          <CardSubtitle className="mb-2 text-muted">
+            {editing ? "" : "Ingredients:"}
+          </CardSubtitle>
           {editing ? (
             <div>
-              <Label>Required Ingredients</Label>{" "}
+              <Label>Required Ingredients:</Label>{" "}
               <Button
+                className="my-auto py-0"
                 color="secondary"
                 onClick={() => setIsOpenIngredients(!isOpenIngredients)}
                 style={{
@@ -144,6 +150,7 @@ function RenderCocktail({ cocktail, ...props }) {
               <Collapse isOpen={isOpenIngredients}>
                 <IngredientDirectory
                   ingredients={props.ingredients}
+                  ingredientCategories={props.ingredientCategories}
                   toggleIngredient={toggleIngredient}
                   prefilledList={editedCocktail.requiredIngredients}
                 />
@@ -192,88 +199,6 @@ function RenderCocktail({ cocktail, ...props }) {
       </Card>
     </div>
   );
-  // } else {
-  //   return (
-  //     <div className="col-lg-7 col-md-9 mx-auto">
-  //       <Card>
-  //         <div className="row pt-2 mx-3">
-  //           <div className="col-8 offset-2">
-  //             <CardTitle>
-  //               <Label htmlFor="name">Cocktail Name: </Label>
-  //               <Input
-  //                 type="text"
-  //                 id="name"
-  //                 name="name"
-  //                 defaultValue={editedCocktail.name}
-  //                 onChange={updateEditedCocktail}
-  //               />
-  //             </CardTitle>
-  //           </div>
-  //           <div className="col-1 offset-1">
-  //             <ButtonDropdown
-  //               isOpen={buttonDropdownIsOpen}
-  //               toggle={() => toggleButtonDropDown(!buttonDropdownIsOpen)}
-  //             >
-  //               <DropdownToggle caret />
-  //               <DropdownMenu>
-  //                 <DropdownItem onClick={() => toggleEdit(false)}>
-  //                   Cancel
-  //                 </DropdownItem>
-  //               </DropdownMenu>
-  //             </ButtonDropdown>
-  //           </div>
-  //         </div>
-  //         <CardBody>
-  //           <CardImg src={editedCocktail.image} width="30"></CardImg>
-  //           <CardSubtitle className="mb-2 text-muted">
-  //             Ingredients:
-  //           </CardSubtitle>
-  //           <div>
-  //             <Label>Required Ingredients</Label>{" "}
-  //             <Button
-  //               color="secondary"
-  //               onClick={() => setIsOpenIngredients(!isOpenIngredients)}
-  //               style={{
-  //                 marginBottom: "1rem",
-  //               }}
-  //             >
-  //               Toggle Ingredients
-  //             </Button>
-  //             <Collapse isOpen={isOpenIngredients}>
-  //               <IngredientDirectory
-  //                 ingredients={props.ingredients}
-  //                 toggleIngredient={toggleIngredient}
-  //                 prefilledList={editedCocktail.requiredIngredients}
-  //               />
-  //             </Collapse>
-  //           </div>
-  //           <Label htmlFor="recipe">Recipe: </Label>
-  //           <Input
-  //             type="textarea"
-  //             id="recipe"
-  //             name="recipe"
-  //             defaultValue={editedCocktail.recipe}
-  //             rows="3"
-  //             onChange={updateEditedCocktail}
-  //           />
-  //           <Button
-  //             color="primary"
-  //             onClick={() => {
-  //               props.commitEditedCocktail(editedCocktail);
-  //               toggleEdit(false);
-  //               navigate(`/directory/${props.id}`);
-  //             }}
-  //             style={{
-  //               margin: "1rem",
-  //             }}
-  //           >
-  //             Submit
-  //           </Button>
-  //         </CardBody>
-  //       </Card>
-  //     </div>
-  //   );
-  // }
 }
 
 function CocktailInfo(props) {
@@ -293,6 +218,7 @@ function CocktailInfo(props) {
             toggleFavorite={props.toggleFavorite}
             favorites={props.favorites}
             ingredients={props.ingredients}
+            ingredientCategories={props.ingredientCategories}
             commitEditedCocktail={props.commitEditedCocktail}
             id={id}
           />
