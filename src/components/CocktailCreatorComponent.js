@@ -1,22 +1,18 @@
 import React, { useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
 import { Form, FormGroup, Button, Collapse, Label, Input } from "reactstrap";
+import { postCocktail, getUserCocktails } from "../helpers/homebartenderServer";
+import { useNavigate } from "react-router-dom";
 
-function CocktailCreator({
-  ingredients,
-  ingredientCategories,
-  addMyCocktail,
-  myCocktails,
-}) {
+function CocktailCreator({ ingredients, ingredientCategories, ...props }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
   const [newCocktail, setNewCocktail] = useState({
-    id: null,
     name: "",
     requiredIngredients: [],
     recipe: "",
     image: "",
-    userCreated: true,
   });
+  const navigate = useNavigate();
 
   const toggleIngredients = () => setIsOpenIngredients(!isOpenIngredients);
 
@@ -27,6 +23,7 @@ function CocktailCreator({
 
   const toggleIngredient = (ingredient) => {
     const newData = { ...newCocktail };
+    if (!newCocktail.requiredIngredients) newCocktail.requiredIngredients = [];
     if (!newCocktail.requiredIngredients.includes(ingredient)) {
       newData.requiredIngredients = [
         ...newData.requiredIngredients,
@@ -41,11 +38,31 @@ function CocktailCreator({
     setNewCocktail(newData);
   };
 
-  const commitCocktail = (e) => {
-    newCocktail.id = myCocktails.length;
-    addMyCocktail(newCocktail);
-    alert(newCocktail.name + " has been added to the cocktail list.");
+  const commitCocktail = async (e) => {
     e.preventDefault();
+    try {
+      console.log(newCocktail);
+      const response = await postCocktail(newCocktail);
+      if (response) {
+        alert(newCocktail.name + " has been added to the cocktail list.");
+        updateUserCocktails();
+      } else {
+        const err = new Error(
+          "Could not add your cocktail. Make sure name, ingredient, and recipe fields are filled."
+        );
+        alert(err);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const updateUserCocktails = async () => {
+    const newUserCocktails = await getUserCocktails();
+    const sortedUserCocktails = newUserCocktails.sort((a, b) =>
+      a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
+    );
+    props.onGetUserCocktails(sortedUserCocktails);
   };
 
   const getImage = (e) => {

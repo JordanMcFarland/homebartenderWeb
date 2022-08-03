@@ -7,7 +7,11 @@ import FavoriteComponent from "./FavoriteComponent";
 import MyBarComponent from "./MyBarComponent";
 import LoginComponent from "./LoginComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { fetchIngredients, postCocktail } from "../helpers/airtable";
+import {
+  fetchCocktails,
+  fetchIngredients,
+  postCocktail,
+} from "../helpers/airtable";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
@@ -18,27 +22,20 @@ const Main = ({ history }) => {
   const [favorites, setFavorites] = useState([]);
   const [myCocktails, setMyCocktails] = useState([]);
   const [myBar, setMyBar] = useState([]);
+  const [user, setUser] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCocktailAirTable = async () => {
       try {
-        const response = await fetch(
-          `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/COCKTAILS`,
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
-            },
-          }
-        );
-        const list = await response.json();
+        const list = await fetchCocktails();
         const cocktailList = list.records
           .map((record) => {
-            const { id, name, requiredIngredients, recipe, image } =
+            const { _id, name, requiredIngredients, recipe, image } =
               record.fields;
             const ingredientsArr = requiredIngredients.split(",");
             return {
-              id,
+              _id,
               name,
               requiredIngredients: ingredientsArr.map((item) => item.trim()),
               recipe,
@@ -46,7 +43,7 @@ const Main = ({ history }) => {
             };
           })
           .sort((a, b) => (a.name > b.name ? 1 : -1));
-        //console.log(cocktailList);
+        console.log(cocktailList);
         setCocktails((prevState) => [...prevState, ...cocktailList]);
       } catch (e) {
         console.error(e);
@@ -94,24 +91,44 @@ const Main = ({ history }) => {
     fetchIngredientAirTable();
   }, []);
 
-  const addMyCocktail = (cocktail) => {
-    setMyCocktails((prevState) => [...prevState, cocktail]);
-    //postCocktail(formattedCocktail);  *** Need to add new airtable table to post 'my cocktail' list unique to each user
+  const handleUserLogin = (userData) => {
+    setUser(userData);
+    navigate("/directory");
+  };
+
+  const handleUserLogout = () => {
+    setUser();
+    localStorage.removeItem("token");
+    localStorage.removeItem("creds");
+    navigate("/directory");
+  };
+
+  const handleGetUserCocktails = (newUserCocktails) => {
+    setUser({ ...user, userCocktails: newUserCocktails });
     navigate("/mycocktails");
+  };
+
+  const addMyCocktail = (cocktail) => {
+    if (user) {
+      setMyCocktails((prevState) => [...prevState, cocktail]);
+      console.log(myCocktails[0].toString());
+      postCocktail(user, myCocktails);
+      navigate("/mycocktails");
+    } else alert("You must be logged in to create cocktails!");
   };
 
   // This updates the  mycocktail list
   // Navigates back to the cocktail directory
   const deleteCocktail = (unwantedCocktail) => {
     const updatedCocktailList = myCocktails.filter(
-      (cocktail) => cocktail.id !== unwantedCocktail.id
+      (cocktail) => cocktail._id !== unwantedCocktail._id
     );
     console.log(unwantedCocktail);
     setMyCocktails(updatedCocktailList);
     // Also check if cockails is in favorites list and delete it there
     const updatedFavoritesList = favorites.filter(
       (cocktail) =>
-        cocktail.id !== unwantedCocktail.id &&
+        cocktail._id !== unwantedCocktail._id &&
         cocktail.name !== unwantedCocktail.name
     );
     console.log("Favorites is updated: " + updatedFavoritesList);
@@ -131,7 +148,7 @@ const Main = ({ history }) => {
   const commitEditedCocktail = (editedCocktail) => {
     const editedCocktailList = myCocktails;
     const index = editedCocktailList.findIndex(
-      (cocktail) => cocktail.id === editedCocktail.id
+      (cocktail) => cocktail._id === editedCocktail._id
     );
     editedCocktailList[index] = editedCocktail;
     setMyCocktails(editedCocktailList);
@@ -144,30 +161,16 @@ const Main = ({ history }) => {
   if (!loading) {
     return (
       <>
-        <Header />
+        <Header user={user} onUserLogout={handleUserLogout} />
         <Routes>
           <Route
-            path="/directory/:id"
+            path="/directory/:_id"
             element={
               <CocktailInfo
                 cocktails={cocktails}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
                 ingredients={ingredients}
-              />
-            }
-          />
-          <Route
-            path="/mycocktails/:id"
-            element={
-              <CocktailInfo
-                cocktails={myCocktails}
-                deleteCocktail={deleteCocktail}
-                toggleFavorite={toggleFavorite}
-                favorites={favorites}
-                ingredients={ingredients}
-                ingredientCategories={ingredientCategories}
-                commitEditedCocktail={commitEditedCocktail}
               />
             }
           />
@@ -179,13 +182,28 @@ const Main = ({ history }) => {
             }
           />
           <Route
+            path="/mycocktails/:_id"
+            element={
+              <CocktailInfo
+                cocktails={user?.userCocktails}
+                deleteCocktail={deleteCocktail}
+                toggleFavorite={toggleFavorite}
+                favorites={favorites}
+                ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
+                commitEditedCocktail={commitEditedCocktail}
+              />
+            }
+          />
+          <Route
             path="/cocktailcreator"
             element={
               <CocktailCreator
                 ingredients={ingredients}
                 ingredientCategories={ingredientCategories}
-                myCocktails={myCocktails}
+                userCocktails={user?.userCocktails}
                 addMyCocktail={addMyCocktail}
+                onGetUserCocktails={handleGetUserCocktails}
               />
             }
           />
@@ -194,7 +212,7 @@ const Main = ({ history }) => {
             path="/mycocktails"
             element={
               <CocktailDirectory
-                cocktails={myCocktails}
+                cocktails={user?.userCocktails}
                 location="mycocktails"
               />
             }
@@ -217,7 +235,12 @@ const Main = ({ history }) => {
               />
             }
           />
-          <Route path="/login" element={<LoginComponent />} />
+          <Route
+            path="/login"
+            element={
+              <LoginComponent setUser={setUser} onUserLogin={handleUserLogin} />
+            }
+          />
         </Routes>
       </>
     );

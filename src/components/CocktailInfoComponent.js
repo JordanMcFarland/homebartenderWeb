@@ -183,7 +183,7 @@ function RenderCocktail({ cocktail, ...props }) {
                 onClick={() => {
                   props.commitEditedCocktail(editedCocktail);
                   toggleEdit(false);
-                  navigate(`/mycocktails/${props.id}`);
+                  navigate(`/mycocktails/${props._id}`);
                 }}
                 style={{
                   margin: "1rem",
@@ -202,29 +202,30 @@ function RenderCocktail({ cocktail, ...props }) {
 }
 
 function CocktailInfo(props) {
-  let { id } = useParams();
-
+  let { _id } = useParams();
   if (props.cocktails) {
-    const cocktail = props.cocktails.filter(
-      (cocktail) => cocktail.id === Number(id)
-    )[0];
+    const cocktail = props.cocktails.filter((cocktail) => {
+      return cocktail._id.toString() === _id;
+    })[0];
 
-    return (
-      <div className="container py-3">
-        <div className="row">
-          <RenderCocktail
-            cocktail={cocktail}
-            deleteCocktail={props.deleteCocktail}
-            toggleFavorite={props.toggleFavorite}
-            favorites={props.favorites}
-            ingredients={props.ingredients}
-            ingredientCategories={props.ingredientCategories}
-            commitEditedCocktail={props.commitEditedCocktail}
-            id={id}
-          />
+    if (cocktail) {
+      return (
+        <div className="container py-3">
+          <div className="row">
+            <RenderCocktail
+              cocktail={cocktail}
+              deleteCocktail={props.deleteCocktail}
+              toggleFavorite={props.toggleFavorite}
+              favorites={props.favorites}
+              ingredients={props.ingredients}
+              ingredientCategories={props.ingredientCategories}
+              commitEditedCocktail={props.commitEditedCocktail}
+              _id={_id}
+            />
+          </div>
         </div>
-      </div>
-    );
+      );
+    }
   }
   return <div />;
 }

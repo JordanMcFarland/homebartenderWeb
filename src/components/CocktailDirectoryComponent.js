@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useInsertionEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 
@@ -7,7 +7,7 @@ function RenderDirectoryItem({ cocktail, ...props }) {
     <Card style={{ minHeight: 60 }}>
       <Link
         to={`/${props.location === "directory" ? "directory" : "mycocktails"}/${
-          cocktail.id
+          cocktail._id
         }`}
       >
         {cocktail.image ? (
@@ -44,7 +44,7 @@ function CocktailDirectory(props) {
 
   const directory = cocktailDirectory.map((cocktail) => {
     return (
-      <div key={cocktail.id} className="col-md-5 m-1">
+      <div key={cocktail._id} className="col-md-5 m-1">
         <RenderDirectoryItem cocktail={cocktail} location={props.location} />
       </div>
     );
@@ -94,7 +94,7 @@ function CocktailDirectory(props) {
       // Check whether or not all ingredients are included and whether or not the cocktail is already on the list
       if (
         hasIngredients &&
-        !filteredCocktails.some((item) => item.id === cocktail.id)
+        !filteredCocktails.some((item) => item._id === cocktail._id)
       ) {
         // If so, pass this into our empty array
         filteredCocktails.push(cocktail);
@@ -103,15 +103,6 @@ function CocktailDirectory(props) {
 
     // Finally, set state with the array of cocktails
     setCocktailDirectory(filteredCocktails);
-
-    // return newSearchTerms.forEach(term => {
-    //   const item = cocktail.requiredIngredients.filter(ingredient => ingredient.toUpperCase().includes(term.toUpperCase()));
-    //   console.log('item;', item);
-    // })
-
-    // return cocktail.requiredIngredients.some(ingredient => newSearchTerms.some(searchTerm => {
-    //   return searchTerm.toUpperCase().includes(ingredient.toUpperCase());
-    // }));
   };
 
   if (!props.cocktails && props.location === "mycocktails") {

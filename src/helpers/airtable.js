@@ -3,12 +3,13 @@ var base = new Airtable({ apiKey: process.env.REACT_APP_AIRTABLE_KEY }).base(
   process.env.REACT_APP_AIRTABLE_BASE
 );
 
-export const postCocktail = (cocktail) => {
-  base("COCKTAILS").create(
+export const postCocktail = (user, userCocktails) => {
+  base("USERS").update(
     [
       {
+        id: user.id,
         fields: {
-          ...cocktail,
+          userCocktails: "working?",
         },
       },
     ],
@@ -24,6 +25,38 @@ export const postCocktail = (cocktail) => {
   );
 };
 
+export const postUserToAirTable = (userInfo) => {
+  base("USERS").create(
+    [
+      {
+        fields: {
+          ...userInfo,
+        },
+      },
+    ],
+    function (err, records) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    }
+  );
+};
+
+export const fetchCocktails = async () => {
+  const response = await fetch(
+    `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/COCKTAILS`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
+      },
+    }
+  );
+  const list = await response.json();
+
+  return list;
+};
+
 export const fetchIngredients = async () => {
   const response = await fetch(
     `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/INGREDIENTS`,
@@ -34,23 +67,31 @@ export const fetchIngredients = async () => {
     }
   );
   const list = await response.json();
-  console.log(list);
 
-  // const listObj = {};
-  // list.records.forEach((record) => {
-  //   const { type, name } = record.fields;
-
-  //   if (!listObj[type]) {
-  //     listObj[type] = [];
-  //   }
-
-  //   listObj[type] = [...listObj[type], name];
-  // });
-
-  // const keyArr = Object.keys(listObj);
-  // keyArr.forEach((key) => {
-  //   console.log(listObj[key]);
-  // });
-  // console.log(listObj);
   return list;
+};
+
+export const getUserInfoFromAirtable = async (username, password) => {
+  const response = await fetch(
+    `https://api.airtable.com/v0/${process.env.REACT_APP_AIRTABLE_BASE}/USERS`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.REACT_APP_AIRTABLE_KEY}`,
+      },
+    }
+  );
+  const list = await response.json();
+
+  return list;
+};
+
+export const updateUserFavorites = async (user, userFavorites) => {
+  base("USERS").update([
+    {
+      id: user.id,
+      fields: {
+        userFavorites: userFavorites,
+      },
+    },
+  ]);
 };
