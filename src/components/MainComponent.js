@@ -12,6 +12,11 @@ import {
   fetchIngredients,
   postCocktail,
 } from "../helpers/airtable";
+import {
+  getUserCocktails,
+  deleteUserCocktail,
+  updateUserCocktail,
+} from "../helpers/homebartenderServer";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
@@ -91,7 +96,7 @@ const Main = ({ history }) => {
     fetchIngredientAirTable();
   }, []);
 
-  const handleUserLogin = (userData) => {
+  const handleUserLogin = async (userData) => {
     setUser(userData);
     navigate("/directory");
   };
@@ -99,12 +104,26 @@ const Main = ({ history }) => {
   const handleUserLogout = () => {
     setUser();
     localStorage.removeItem("token");
-    localStorage.removeItem("creds");
     navigate("/directory");
   };
 
-  const handleGetUserCocktails = (newUserCocktails) => {
-    setUser({ ...user, userCocktails: newUserCocktails });
+  const handleGetUserCocktails = async () => {
+    const updatedUserCocktails = await getUserCocktails();
+    setUser({ ...user, userCocktails: updatedUserCocktails });
+    navigate("/mycocktails");
+  };
+
+  const handleUpdateUserCocktail = async (userCocktailId, editedCocktail) => {
+    const updatedUserCocktails = await updateUserCocktail(
+      userCocktailId,
+      editedCocktail
+    );
+    setUser({ ...user, userCocktails: updatedUserCocktails });
+  };
+
+  const handleDeleteUserCocktail = async (userCocktailId) => {
+    const updatedUserCocktails = await deleteUserCocktail(userCocktailId);
+    setUser({ ...user, userCocktails: updatedUserCocktails });
     navigate("/mycocktails");
   };
 
@@ -115,25 +134,6 @@ const Main = ({ history }) => {
       postCocktail(user, myCocktails);
       navigate("/mycocktails");
     } else alert("You must be logged in to create cocktails!");
-  };
-
-  // This updates the  mycocktail list
-  // Navigates back to the cocktail directory
-  const deleteCocktail = (unwantedCocktail) => {
-    const updatedCocktailList = myCocktails.filter(
-      (cocktail) => cocktail._id !== unwantedCocktail._id
-    );
-    console.log(unwantedCocktail);
-    setMyCocktails(updatedCocktailList);
-    // Also check if cockails is in favorites list and delete it there
-    const updatedFavoritesList = favorites.filter(
-      (cocktail) =>
-        cocktail._id !== unwantedCocktail._id &&
-        cocktail.name !== unwantedCocktail.name
-    );
-    console.log("Favorites is updated: " + updatedFavoritesList);
-    setFavorites(updatedFavoritesList);
-    navigate("/mycocktails");
   };
 
   const toggleFavorite = (cocktail) => {
@@ -177,16 +177,15 @@ const Main = ({ history }) => {
           <Route
             key="directory"
             path="/directory"
-            element={
-              <CocktailDirectory cocktails={cocktails} location="directory" />
-            }
+            element={<CocktailDirectory cocktails={cocktails} />}
           />
           <Route
             path="/mycocktails/:_id"
             element={
               <CocktailInfo
                 cocktails={user?.userCocktails}
-                deleteCocktail={deleteCocktail}
+                onDeleteCocktail={handleDeleteUserCocktail}
+                onUpdateUserCocktail={handleUpdateUserCocktail}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
                 ingredients={ingredients}
@@ -210,12 +209,7 @@ const Main = ({ history }) => {
           <Route
             key="mycocktails"
             path="/mycocktails"
-            element={
-              <CocktailDirectory
-                cocktails={user?.userCocktails}
-                location="mycocktails"
-              />
-            }
+            element={<CocktailDirectory cocktails={user?.userCocktails} />}
           />
           <Route
             path="/favorites"

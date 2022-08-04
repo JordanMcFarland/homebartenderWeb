@@ -9,9 +9,9 @@ const FavoriteComponent = (props) => {
         <Card style={{ minHeight: 60 }}>
           <Link
             to={
-              cocktail.userCreated
-                ? `/mycocktails/${cocktail.id}`
-                : `/directory/${cocktail.id}`
+              cocktail.userId
+                ? `/mycocktails/${cocktail._id}`
+                : `/directory/${cocktail._id}`
             }
           >
             {cocktail.image ? (

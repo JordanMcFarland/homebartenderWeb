@@ -6,9 +6,9 @@ function RenderDirectoryItem({ cocktail, ...props }) {
   return (
     <Card style={{ minHeight: 60 }}>
       <Link
-        to={`/${props.location === "directory" ? "directory" : "mycocktails"}/${
-          cocktail._id
-        }`}
+        to={`/${
+          !cocktail.userId === "directory" ? "directory" : "mycocktails"
+        }/${cocktail._id}`}
       >
         {cocktail.image ? (
           <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
@@ -34,18 +34,16 @@ function CocktailDirectory(props) {
     } else {
       searchByIngredients();
     }
-    // console.log(cocktailDirectory);
-    // console.log(searchBy);
   }, [searchTerm]);
 
   useEffect(() => {
     setCocktailDirectory(props.cocktails);
-  }, [props.location]);
+  }, [window.location.pathname]);
 
   const directory = cocktailDirectory.map((cocktail) => {
     return (
       <div key={cocktail._id} className="col-md-5 m-1">
-        <RenderDirectoryItem cocktail={cocktail} location={props.location} />
+        <RenderDirectoryItem cocktail={cocktail} />
       </div>
     );
   });
@@ -105,7 +103,7 @@ function CocktailDirectory(props) {
     setCocktailDirectory(filteredCocktails);
   };
 
-  if (!props.cocktails && props.location === "mycocktails") {
+  if (!props.cocktails && window.location.pathname === "mycocktails") {
     return <div>You have not added any cocktails.</div>;
   } else {
     return (
@@ -121,7 +119,8 @@ function CocktailDirectory(props) {
         </select>
         {/*<Button onClick={searchByName}>Search</Button> */}
         <div className="row">
-          {props.location === "mycocktails" && cocktailDirectory.length <= 0
+          {window.location.pathname === "mycocktails" &&
+          cocktailDirectory.length <= 0
             ? "You have not added any cocktails."
             : directory}
         </div>

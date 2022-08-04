@@ -21,18 +21,12 @@ function MyBarComponent({
   const [editingMyBar, toggleEditMyBar] = useState(false);
   const [craftableList, setCraftableList] = useState([]);
 
-  useEffect(() => {
-    console.log(ingredients);
-  }, []);
-
   // Add/Remove ingredients from myBar
   const toggleIngredient = (ingredient) => {
     if (myBar.includes(ingredient)) {
       setMyBar((prevState) => prevState.filter((item) => item !== ingredient));
-      console.log(ingredient + " has been REMOVED from myBar");
     } else {
       setMyBar((prevState) => [...prevState, ingredient]);
-      console.log(ingredient + " has been ADDED to myBar");
     }
   };
 
@@ -121,9 +115,9 @@ function MyBarComponent({
   const renderCraftableCocktails = craftableList.length ? (
     craftableList.map((cocktail) => {
       return (
-        <div className="col-md-6 my-1" key={cocktail.id}>
+        <div className="col-md-6 my-1" key={cocktail._id}>
           <Card style={{ minHeight: 60 }}>
-            <Link to={`/directory/${cocktail.id}`}>
+            <Link to={`/directory/${cocktail._id}`}>
               {cocktail.image ? (
                 <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
               ) : (

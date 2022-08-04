@@ -24,16 +24,6 @@ function RenderCocktail({ cocktail, ...props }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (editedCocktail) {
-      console.log("Ingredients: ", editedCocktail.requiredIngredients);
-    }
-  }, [editedCocktail?.requiredIngredients]);
-
-  useEffect(() => {
-    console.log("Original Cocktail: ", cocktail);
-  }, [cocktail]);
-
   const updateEditedCocktail = (e) => {
     const { name, value } = e.target;
     setEditedCocktail({ ...editedCocktail, [name]: value });
@@ -81,7 +71,6 @@ function RenderCocktail({ cocktail, ...props }) {
                   defaultValue={editedCocktail.name}
                   onChange={(e) => {
                     updateEditedCocktail(e);
-                    console.log(cocktail.name);
                   }}
                 />
               </>
@@ -109,13 +98,13 @@ function RenderCocktail({ cocktail, ...props }) {
                         ? "Unfavorite"
                         : "Favorite"}
                     </DropdownItem>
-                    {cocktail.userCreated ? (
+                    {cocktail.userId ? (
                       <>
                         <DropdownItem onClick={() => toggleEdit(true)}>
                           Edit
                         </DropdownItem>
                         <DropdownItem
-                          onClick={() => props.deleteCocktail(cocktail)}
+                          onClick={() => props.onDeleteCocktail(cocktail._id)}
                         >
                           Delete
                         </DropdownItem>
@@ -181,7 +170,10 @@ function RenderCocktail({ cocktail, ...props }) {
               <Button
                 color="primary"
                 onClick={() => {
-                  props.commitEditedCocktail(editedCocktail);
+                  props.onUpdateUserCocktail(
+                    editedCocktail._id,
+                    editedCocktail
+                  );
                   toggleEdit(false);
                   navigate(`/mycocktails/${props._id}`);
                 }}
@@ -214,7 +206,8 @@ function CocktailInfo(props) {
           <div className="row">
             <RenderCocktail
               cocktail={cocktail}
-              deleteCocktail={props.deleteCocktail}
+              onDeleteCocktail={props.onDeleteCocktail}
+              onUpdateUserCocktail={props.onUpdateUserCocktail}
               toggleFavorite={props.toggleFavorite}
               favorites={props.favorites}
               ingredients={props.ingredients}

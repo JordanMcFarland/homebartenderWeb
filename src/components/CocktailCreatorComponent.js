@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
 import { Form, FormGroup, Button, Collapse, Label, Input } from "reactstrap";
-import { postCocktail, getUserCocktails } from "../helpers/homebartenderServer";
-import { useNavigate } from "react-router-dom";
+import { postCocktail } from "../helpers/homebartenderServer";
 
 function CocktailCreator({ ingredients, ingredientCategories, ...props }) {
   const [isOpenIngredients, setIsOpenIngredients] = useState(false);
@@ -12,7 +11,6 @@ function CocktailCreator({ ingredients, ingredientCategories, ...props }) {
     recipe: "",
     image: "",
   });
-  const navigate = useNavigate();
 
   const toggleIngredients = () => setIsOpenIngredients(!isOpenIngredients);
 
@@ -41,11 +39,10 @@ function CocktailCreator({ ingredients, ingredientCategories, ...props }) {
   const commitCocktail = async (e) => {
     e.preventDefault();
     try {
-      console.log(newCocktail);
       const response = await postCocktail(newCocktail);
       if (response) {
         alert(newCocktail.name + " has been added to the cocktail list.");
-        updateUserCocktails();
+        props.onGetUserCocktails();
       } else {
         const err = new Error(
           "Could not add your cocktail. Make sure name, ingredient, and recipe fields are filled."
@@ -55,14 +52,6 @@ function CocktailCreator({ ingredients, ingredientCategories, ...props }) {
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const updateUserCocktails = async () => {
-    const newUserCocktails = await getUserCocktails();
-    const sortedUserCocktails = newUserCocktails.sort((a, b) =>
-      a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-    );
-    props.onGetUserCocktails(sortedUserCocktails);
   };
 
   const getImage = (e) => {
