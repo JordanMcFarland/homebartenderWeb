@@ -16,6 +16,9 @@ import {
   getUserCocktails,
   deleteUserCocktail,
   updateUserCocktail,
+  getUserFavorites,
+  postUserFavorite,
+  deleteUserFavorite,
 } from "../helpers/homebartenderServer";
 
 const Main = ({ history }) => {
@@ -48,7 +51,6 @@ const Main = ({ history }) => {
             };
           })
           .sort((a, b) => (a.name > b.name ? 1 : -1));
-        console.log(cocktailList);
         setCocktails((prevState) => [...prevState, ...cocktailList]);
       } catch (e) {
         console.error(e);
@@ -98,6 +100,7 @@ const Main = ({ history }) => {
 
   const handleUserLogin = async (userData) => {
     setUser(userData);
+    handleGetUserFavorites();
     navigate("/directory");
   };
 
@@ -127,35 +130,74 @@ const Main = ({ history }) => {
     navigate("/mycocktails");
   };
 
-  const addMyCocktail = (cocktail) => {
-    if (user) {
-      setMyCocktails((prevState) => [...prevState, cocktail]);
-      console.log(myCocktails[0].toString());
-      postCocktail(user, myCocktails);
-      navigate("/mycocktails");
-    } else alert("You must be logged in to create cocktails!");
+  const handleGetUserFavorites = async () => {
+    try {
+      const response = await getUserFavorites();
+      const sortedFavoriteCocktails = response
+        .map((item) => {
+          if (!item.userId) {
+            const stockCocktailInfo = cocktails.filter((cocktail) => {
+              return cocktail._id.toString() === item._id;
+            })[0];
+            return { _id: item._id, name: stockCocktailInfo.name };
+          } else return item;
+        })
+        .sort((a, b) => (a.name > b.name ? 1 : -1));
+      setFavorites(sortedFavoriteCocktails);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handlePostUserFavorite = async (cocktailInfo) => {
+    try {
+      const response = await postUserFavorite(cocktailInfo);
+      if (!response.ok) {
+        const err =
+          response.statusText +
+          ` could not add cocktail: ${cocktailInfo} to favorites because it's already a favorite.`;
+        throw err;
+      } else {
+        handleGetUserFavorites();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteUserFavorite = async (cocktailInfo) => {
+    try {
+      const response = await deleteUserFavorite(cocktailInfo);
+      if (!response.ok) {
+        const err =
+          response.statusText +
+          ` could not delete cocktail: ${cocktailInfo} from you favorites.`;
+        throw err;
+      } else {
+        handleGetUserFavorites();
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const toggleFavorite = (cocktail) => {
-    if (favorites.includes(cocktail)) {
-      const updatedFavorites = favorites.filter(
-        (favorite) => favorite !== cocktail
+    if (
+      favorites.some(
+        (favorite) => favorite._id.toString() === cocktail._id.toString()
+      )
+    ) {
+      handleDeleteUserFavorite(
+        JSON.stringify({ _id: cocktail._id, userId: cocktail.userId })
       );
-      setFavorites(updatedFavorites);
-    } else setFavorites([...favorites, cocktail]);
-  };
-
-  const commitEditedCocktail = (editedCocktail) => {
-    const editedCocktailList = myCocktails;
-    const index = editedCocktailList.findIndex(
-      (cocktail) => cocktail._id === editedCocktail._id
-    );
-    editedCocktailList[index] = editedCocktail;
-    setMyCocktails(editedCocktailList);
+    } else
+      handlePostUserFavorite(
+        JSON.stringify({ _id: cocktail._id, userId: cocktail.userId })
+      );
   };
 
   if (err) {
-    return <h1>Something went wrong.</h1>;
+    return <h1>Something went wrong. {err}</h1>;
   }
 
   if (!loading) {
@@ -190,7 +232,6 @@ const Main = ({ history }) => {
                 favorites={favorites}
                 ingredients={ingredients}
                 ingredientCategories={ingredientCategories}
-                commitEditedCocktail={commitEditedCocktail}
               />
             }
           />
@@ -201,7 +242,6 @@ const Main = ({ history }) => {
                 ingredients={ingredients}
                 ingredientCategories={ingredientCategories}
                 userCocktails={user?.userCocktails}
-                addMyCocktail={addMyCocktail}
                 onGetUserCocktails={handleGetUserCocktails}
               />
             }
@@ -214,7 +254,11 @@ const Main = ({ history }) => {
           <Route
             path="/favorites"
             element={
-              <FavoriteComponent favorites={favorites} cocktails={cocktails} />
+              <FavoriteComponent
+                favorites={favorites}
+                cocktails={cocktails}
+                onGetUserFavorites={handleGetUserFavorites}
+              />
             }
           />
           <Route

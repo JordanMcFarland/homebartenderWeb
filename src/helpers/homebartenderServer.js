@@ -1,3 +1,4 @@
+import { getNextKeyDef } from "@testing-library/user-event/dist/keyboard/getNextKeyDef";
 import { baseUrl } from "../shared/baseUrl";
 
 // *** User Calls ***
@@ -109,6 +110,15 @@ export const getUserCocktails = async () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+
+    if (!response.ok) {
+      const error = new Error(
+        `Error ${response.status}: ${response.statusText}`
+      );
+      error.response = response;
+      throw error;
+    }
+
     const json = await response.json();
 
     if (json) {
@@ -138,8 +148,15 @@ export const deleteUserCocktail = async (userCocktailId) => {
       }
     );
 
+    if (!response.ok) {
+      const error = new Error(
+        `Error ${response.status}: ${response.statusText}`
+      );
+      error.response = response;
+      throw error;
+    }
+
     const json = await response.json();
-    console.log(json);
 
     if (json) {
       return json.sort((a, b) =>
@@ -173,6 +190,14 @@ export const updateUserCocktail = async (userCocktailId, editedCocktail) => {
       }
     );
 
+    if (!response.ok) {
+      const error = new Error(
+        `Error ${response.status}: ${response.statusText}`
+      );
+      error.response = response;
+      throw error;
+    }
+
     const json = await response.json();
     console.log(json);
 
@@ -187,5 +212,102 @@ export const updateUserCocktail = async (userCocktailId, editedCocktail) => {
     }
   } catch (err) {
     console.error(err);
+  }
+};
+
+// *** User Favorites ***
+
+export const getUserFavorites = async () => {
+  try {
+    const response = await fetch(baseUrl + "users/favorites", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = new Error(
+        `Error ${response.status}: ${response.statusText}`
+      );
+      error.response = response;
+      throw error;
+    }
+
+    const json = await response.json();
+    console.log(json);
+
+    if (json) {
+      return json;
+    } else {
+      const error = new Error("Error " + json.status);
+      error.response = json;
+      throw error;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const postUserFavorite = async (cocktailInfo) => {
+  try {
+    const response = await fetch(baseUrl + "users/favorites", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: cocktailInfo,
+    });
+
+    if (!response.ok) {
+      console.log(response);
+      const error = response;
+      throw error;
+    }
+
+    const json = await response.json();
+
+    if (json) {
+      return json;
+    } else {
+      const error = new Error("Error " + json.status);
+      error.response = json;
+      throw error;
+    }
+  } catch (err) {
+    return err;
+  }
+};
+
+export const deleteUserFavorite = async (cocktailInfo) => {
+  try {
+    const response = await fetch(baseUrl + "users/favorites", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: cocktailInfo,
+    });
+
+    if (!response.ok) {
+      console.log(response);
+      const error = response;
+      throw error;
+    }
+
+    const json = await response.json();
+
+    if (json) {
+      return json;
+    } else {
+      const error = new Error("Error " + json.status);
+      error.response = json;
+      throw error;
+    }
+  } catch (err) {
+    return err;
   }
 };

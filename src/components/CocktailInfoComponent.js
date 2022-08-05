@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import IngredientDirectory from "./IngredientDirectoryComponent";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -94,7 +94,10 @@ function RenderCocktail({ cocktail, ...props }) {
                     <DropdownItem
                       onClick={() => props.toggleFavorite(cocktail)}
                     >
-                      {props.favorites.includes(cocktail)
+                      {props.favorites.some(
+                        (favorite) =>
+                          favorite._id.toString() === cocktail._id.toString()
+                      )
                         ? "Unfavorite"
                         : "Favorite"}
                     </DropdownItem>
@@ -212,7 +215,6 @@ function CocktailInfo(props) {
               favorites={props.favorites}
               ingredients={props.ingredients}
               ingredientCategories={props.ingredientCategories}
-              commitEditedCocktail={props.commitEditedCocktail}
               _id={_id}
             />
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useInsertionEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 
@@ -6,9 +6,9 @@ function RenderDirectoryItem({ cocktail, ...props }) {
   return (
     <Card style={{ minHeight: 60 }}>
       <Link
-        to={`/${
-          !cocktail.userId === "directory" ? "directory" : "mycocktails"
-        }/${cocktail._id}`}
+        to={`/${!cocktail.userId ? "directory" : "mycocktails"}/${
+          cocktail._id
+        }`}
       >
         {cocktail.image ? (
           <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
