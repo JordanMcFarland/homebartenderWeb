@@ -1,4 +1,3 @@
-import { getNextKeyDef } from "@testing-library/user-event/dist/keyboard/getNextKeyDef";
 import { baseUrl } from "../shared/baseUrl";
 
 // *** User Calls ***
@@ -236,7 +235,6 @@ export const getUserFavorites = async () => {
     }
 
     const json = await response.json();
-    console.log(json);
 
     if (json) {
       return json;
@@ -293,7 +291,6 @@ export const deleteUserFavorite = async (cocktailInfo) => {
     });
 
     if (!response.ok) {
-      console.log(response);
       const error = response;
       throw error;
     }
@@ -309,5 +306,41 @@ export const deleteUserFavorite = async (cocktailInfo) => {
     }
   } catch (err) {
     return err;
+  }
+};
+
+// *** User Bar ***
+
+// export const getUserBar = async () => {
+
+// }
+
+export const updateUserBar = async (updatedUserBar) => {
+  try {
+    const response = await fetch(baseUrl + "users/userBar", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(updatedUserBar),
+    });
+
+    if (!response.ok) {
+      const error = response;
+      throw error;
+    }
+
+    const json = await response.json();
+
+    if (json) {
+      return json;
+    } else {
+      const error = new Error("Error " + json.status);
+      error.response = json;
+      throw error;
+    }
+  } catch (err) {
+    console.error(err);
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 
 function RenderDirectoryItem({ cocktail, ...props }) {
   return (
@@ -27,6 +27,7 @@ function CocktailDirectory(props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("byName");
   const [cocktailDirectory, setCocktailDirectory] = useState(props.cocktails);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (searchBy === "byName") {
@@ -38,7 +39,7 @@ function CocktailDirectory(props) {
 
   useEffect(() => {
     setCocktailDirectory(props.cocktails);
-  }, [window.location.pathname]);
+  }, [props.cocktails]);
 
   const directory = cocktailDirectory.map((cocktail) => {
     return (
@@ -108,18 +109,32 @@ function CocktailDirectory(props) {
   } else {
     return (
       <div className="container py-3">
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search"
-        />{" "}
-        <select id="searchBy" onChange={(e) => setSearchBy(e.target.value)}>
-          <option value="byName">By Name</option>
-          <option value="byIngredients">By Ingredients</option>
-        </select>
-        {/*<Button onClick={searchByName}>Search</Button> */}
         <div className="row">
-          {window.location.pathname === "mycocktails" &&
+          <div className="col-5 col-sm-4 col-md-3 col-xl-2">
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search"
+            />{" "}
+          </div>
+          <div className="col-5 col-sm-4 col-md-3 col-xl-2">
+            <select id="searchBy" onChange={(e) => setSearchBy(e.target.value)}>
+              <option value="byName">By Name</option>
+              <option value="byIngredients">By Ingredients</option>
+            </select>
+          </div>
+          {window.location.pathname === "/mycocktails" ? (
+            <div className="col">
+              <Button onClick={() => navigate("/mycocktails/cocktailcreator")}>
+                Create a Cocktail
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+        <div className="row pt-3">
+          {window.location.pathname === "/mycocktails" &&
           cocktailDirectory.length <= 0
             ? "You have not added any cocktails."
             : directory}

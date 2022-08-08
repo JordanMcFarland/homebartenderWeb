@@ -7,11 +7,7 @@ import FavoriteComponent from "./FavoriteComponent";
 import MyBarComponent from "./MyBarComponent";
 import LoginComponent from "./LoginComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import {
-  fetchCocktails,
-  fetchIngredients,
-  postCocktail,
-} from "../helpers/airtable";
+import { fetchCocktails, fetchIngredients } from "../helpers/airtable";
 import {
   getUserCocktails,
   deleteUserCocktail,
@@ -28,7 +24,6 @@ const Main = ({ history }) => {
   const [ingredients, setIngredients] = useState({});
   const [ingredientCategories, setIngredientCategories] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const [myCocktails, setMyCocktails] = useState([]);
   const [myBar, setMyBar] = useState([]);
   const [user, setUser] = useState();
   const navigate = useNavigate();
@@ -69,20 +64,24 @@ const Main = ({ history }) => {
 
         // Create a list object with {category: ingredient array} pairs
         const listObj = {};
+        //console.log(list);
         list.records.forEach((record) => {
+          const _id = record.id;
           const { type, name } = record.fields;
 
           if (!listObj[type]) {
             listObj[type] = [];
           }
 
-          listObj[type] = [...listObj[type], name];
+          listObj[type] = [...listObj[type], { _id, name }];
         });
 
         // Create category array and sort ingredients in each category
         const keyArr = Object.keys(listObj);
         keyArr.forEach((key) => {
-          listObj[key] = listObj[key].sort();
+          listObj[key] = listObj[key].sort((a, b) =>
+            a.name > b.name ? 1 : -1
+          );
         });
 
         // Set ingredient & ingredient category state
@@ -100,12 +99,15 @@ const Main = ({ history }) => {
 
   const handleUserLogin = async (userData) => {
     setUser(userData);
-    handleGetUserFavorites();
+    await handleGetUserFavorites();
+    setMyBar(userData.userBar);
     navigate("/directory");
   };
 
   const handleUserLogout = () => {
     setUser();
+    setMyBar();
+    setFavorites();
     localStorage.removeItem("token");
     navigate("/directory");
   };
@@ -124,6 +126,7 @@ const Main = ({ history }) => {
     setUser({ ...user, userCocktails: updatedUserCocktails });
   };
 
+  //Should this check to see if the cocktail is in favorites and delete it?
   const handleDeleteUserCocktail = async (userCocktailId) => {
     const updatedUserCocktails = await deleteUserCocktail(userCocktailId);
     setUser({ ...user, userCocktails: updatedUserCocktails });
@@ -236,7 +239,7 @@ const Main = ({ history }) => {
             }
           />
           <Route
-            path="/cocktailcreator"
+            path="/mycocktails/cocktailcreator"
             element={
               <CocktailCreator
                 ingredients={ingredients}

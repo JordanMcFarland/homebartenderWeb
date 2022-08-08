@@ -20,7 +20,7 @@ Backend Stuff
 --[x] Create route to my bar
 --[] Create ui for my bar
 ----[x] Separate ingredients by type
-----[] Have a specific order that ingredient categories display?
+----[x] Have a specific order that ingredient categories display?
 ----[] Should there be tabs for various ingredient categories for less clutter?
 ----[x] Each will be on a card
 ----[x] Checkboxes
@@ -48,5 +48,6 @@ Backend Stuff
 --[] Edit Cocktails -- still need to provide option for image edit
 
 \*\*User Profile
---[] Add ability to log in
---[] Store user cocktail list
+--[x] Add ability to log in
+--[x] Store user cocktail list
+--[x] Store user favorites

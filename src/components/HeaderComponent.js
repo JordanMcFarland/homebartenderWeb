@@ -54,11 +54,6 @@ const Header = (props) => {
               {props.user ? (
                 <>
                   <NavItem>
-                    <NavLink className="nav-link" to="/cocktailcreator">
-                      Cocktail Creator
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
                     <NavLink className="nav-link" to="/mycocktails">
                       My Cocktails
                     </NavLink>

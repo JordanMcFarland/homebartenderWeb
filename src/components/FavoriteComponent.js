@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 import { Link } from "react-router-dom";
 
-const FavoriteComponent = (props) => {
+const FavoriteComponent = ({ onGetUserFavorites, ...props }) => {
   useEffect(() => {
-    props.onGetUserFavorites();
+    onGetUserFavorites();
   }, []);
 
   const favoriteDirectory = props.favorites.map((cocktail) => {
@@ -37,7 +37,7 @@ const FavoriteComponent = (props) => {
   if (props.favorites.length) {
     return (
       <div className="container">
-        <div className="row">{favoriteDirectory}</div>
+        <div className="row pt-3">{favoriteDirectory}</div>
       </div>
     );
   } else return <div>You have no favorites</div>;

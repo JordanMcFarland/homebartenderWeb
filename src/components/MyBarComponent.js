@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Label,
@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "reactstrap";
 import { Link } from "react-router-dom";
+import { updateUserBar } from "../helpers/homebartenderServer";
 
 function MyBarComponent({
   ingredients,
@@ -22,39 +23,55 @@ function MyBarComponent({
   const [craftableList, setCraftableList] = useState([]);
 
   // Add/Remove ingredients from myBar
-  const toggleIngredient = (ingredient) => {
-    if (myBar.includes(ingredient)) {
-      setMyBar((prevState) => prevState.filter((item) => item !== ingredient));
+  // This isn't saved to server unless user hits submit
+  // Create a pop up for if they navigate away that asks if they want to save changes?
+  const toggleIngredient = (ingredientId) => {
+    if (myBar.includes(ingredientId)) {
+      setMyBar((prevState) =>
+        prevState.filter((item) => item !== ingredientId)
+      );
     } else {
-      setMyBar((prevState) => [...prevState, ingredient]);
+      setMyBar((prevState) => [...prevState, ingredientId]);
+    }
+  };
+
+  const updateMyBar = async () => {
+    try {
+      const response = updateUserBar(myBar);
+
+      if (response.ok) {
+        setMyBar(response.userBar);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   // Create the cards for each ingredient item that is in myBar
   const myBarList = ingredientCategories.map((category, index) => {
     if (
-      ingredients[category].some((ingredient) => myBar.includes(ingredient))
+      ingredients[category].some((ingredient) => myBar.includes(ingredient._id))
     ) {
       return (
         <div key={index} className="mt-3">
           <h3>{category}</h3>
           <div className="row mx-auto">
-            {ingredients[category].map((ingredient, index) => {
-              if (myBar.includes(ingredient)) {
+            {ingredients[category].map((ingredient) => {
+              if (myBar.includes(ingredient._id)) {
                 return (
                   <div
-                    key={index}
+                    key={ingredient._id}
                     className="col-6 col-md-4 col-lg-3 px-2 my-1"
                   >
-                    <Card className="p-2">{ingredient}</Card>
+                    <Card className="p-2">{ingredient.name}</Card>
                   </div>
                 );
-              }
+              } else return <div key={ingredient._id} />;
             })}
           </div>
         </div>
       );
-    }
+    } else return <div key={index} />;
   });
 
   // Render the cards for adding ingredient to myBar
@@ -63,20 +80,23 @@ function MyBarComponent({
       <div key={index} className="mt-3">
         <h3>{category}</h3>
         <div className="row mx-auto">
-          {ingredients[category].map((ingredient, index) => {
+          {ingredients[category].map((ingredient) => {
             return (
-              <div className="col-6 col-md-4 col-lg-3 px-2 my-1" key={index}>
+              <div
+                className="col-6 col-md-4 col-lg-3 px-2 my-1"
+                key={ingredient._id}
+              >
                 <Card>
                   <Label className="pt-2 mx-3" check>
                     <Input
                       type="checkbox"
-                      name={ingredient}
-                      onChange={(e) => {
-                        toggleIngredient(e.target.name);
+                      //ingredient={{ ingredient }}
+                      onChange={() => {
+                        toggleIngredient(ingredient._id);
                       }}
-                      checked={myBar.includes(ingredient)}
+                      checked={myBar.includes(ingredient._id)}
                     />
-                    {" " + ingredient}
+                    {" " + ingredient.name}
                   </Label>
                 </Card>
               </div>
@@ -91,7 +111,14 @@ function MyBarComponent({
   function getCraftableList() {
     const regex = /[0-9]*\.*[0-9]* (ozs|oz|dashes|dash)|\([^)]*\)/g;
     const craftableCocktailList = [];
-    const lowerCaseMyBar = myBar.map((ingredient) => ingredient.toLowerCase());
+    const lowerCaseMyBar = [];
+    ingredientCategories.forEach((category) =>
+      ingredients[category].forEach((ingredient) => {
+        if (myBar.includes(ingredient._id)) {
+          lowerCaseMyBar.push(ingredient.name.toLowerCase());
+        }
+      })
+    );
     cocktails.forEach((cocktail) => {
       let trimmedIngredientList = cocktail.requiredIngredients.map(
         (ingredient) => ingredient.replace(regex, "").trim().toLowerCase()
@@ -103,10 +130,7 @@ function MyBarComponent({
       ) {
         craftableCocktailList.push(cocktail);
       }
-      // console.log(cocktail.name);
-      // console.log(trimmedIngredientList);
     });
-    //console.log(craftableList);
     setCraftableList(craftableCocktailList);
   }
 
@@ -165,6 +189,10 @@ function MyBarComponent({
             <Button
               className="col m-1"
               onClick={() => {
+                if (editingMyBar) {
+                  console.log("Sending ingredients to server...");
+                  updateMyBar();
+                }
                 toggleEditMyBar(!editingMyBar);
               }}
               color="secondary"

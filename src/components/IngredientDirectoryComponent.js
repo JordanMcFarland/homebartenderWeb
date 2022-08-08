@@ -8,13 +8,13 @@ function RenderIngredientItem({ ingredient, toggleIngredient, isChecked }) {
         <Input
           className="mx-3"
           type="checkbox"
-          name={ingredient}
+          name={ingredient.name}
           onChange={(e) => {
             toggleIngredient(e.target.name);
           }}
           checked={isChecked}
         />
-        {" " + ingredient}
+        {" " + ingredient.name}
       </Label>
     </Card>
   );
@@ -36,7 +36,7 @@ function IngredientDirectory(props) {
                   ingredient={ingredient}
                   toggleIngredient={props.toggleIngredient}
                   prefilledList={props.prefilledList}
-                  isChecked={props?.prefilledList?.includes(ingredient)}
+                  isChecked={props?.prefilledList?.includes(ingredient.name)}
                   index={index}
                 />
               </div>
