@@ -66,12 +66,12 @@ function MyBarComponent({
                     <Card className="p-2">{ingredient.name}</Card>
                   </div>
                 );
-              } else return <div key={ingredient._id} />;
+              } else return <></>;
             })}
           </div>
         </div>
       );
-    } else return <div key={index} />;
+    } else return <></>;
   });
 
   // Render the cards for adding ingredient to myBar

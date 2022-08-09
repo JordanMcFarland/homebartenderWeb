@@ -7,7 +7,7 @@ import {
   NavItem,
   Button,
 } from "reactstrap";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, Link } from "react-router-dom";
 
 const Header = (props) => {
   const [isNavOpen, updateNavState] = useState(false);
@@ -19,25 +19,30 @@ const Header = (props) => {
 
   return (
     <>
-      <div className="bg-dark p-5" fluid="true">
+      <div className="bg-dark p-2 pt-3 p-sm-5" fluid="true">
         <div className="container">
           <div className="row">
-            <div className="col-8">
-              <h1 style={{ color: "#B70D29" }}>Home Bartender</h1>
+            <div className="col-8 col-xl-9">
+              <Link style={{ textDecoration: "none" }} to="/directory">
+                <h1 style={{ color: "#B70D29" }}>Home Bartender</h1>
+              </Link>
             </div>
-            <div className="col-2">
-              {props.user ? "Hello, " + props.user.username : ""}
-            </div>
-            <Button
-              className="col-1"
-              onClick={
-                props.user
-                  ? () => props.onUserLogout()
-                  : () => navigate("/login")
-              }
-            >
-              {props.user ? "Logout" : "Login"}
-            </Button>
+            {props.user ? (
+              <div
+                style={{ marginLeft: "auto", textAlign: "right" }}
+                className="col-4 col-sm-4 col-md-4 col-lg-3"
+              >
+                {"Hello, " + props.user.username}
+              </div>
+            ) : (
+              <Button
+                style={{ marginLeft: "auto" }}
+                className="col-4 col-sm-3 col-md-2 col-lg-1"
+                onClick={() => navigate("/login")}
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -73,6 +78,13 @@ const Header = (props) => {
                 <></>
               )}
             </Nav>
+            {props.user ? (
+              <button id="logoutButton" onClick={() => props.onUserLogout()}>
+                Logout
+              </button>
+            ) : (
+              <></>
+            )}
           </Collapse>
         </div>
       </Navbar>

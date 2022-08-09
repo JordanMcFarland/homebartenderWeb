@@ -41,3 +41,24 @@ h2 {
   background-color: #810D21;
 }
 
+#logoutButton {
+  text-align: left;
+  background: none;
+  border-color: none;
+  padding: .5rem;
+  color: rgba(255, 255, 255, 0.55);
+  border: none;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
+  margin-left: auto;
+}
+
+#logoutButton:hover {
+  color: rgba(255,255,255,.75);
+}
+
+@media only screen and (max-width: 768px) {
+  #logoutButton {
+    width: 100%;
+    padding-left: 0;
+  }
+}

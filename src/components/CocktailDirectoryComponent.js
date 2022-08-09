@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
+import {
+  Button,
+  Card,
+  CardImg,
+  CardImgOverlay,
+  CardTitle,
+  Label,
+} from "reactstrap";
 
 function RenderDirectoryItem({ cocktail, ...props }) {
   return (
@@ -32,10 +39,17 @@ function CocktailDirectory(props) {
   useEffect(() => {
     if (searchBy === "byName") {
       searchByName();
-    } else {
+    } else if (searchBy === "byIngredients") {
       searchByIngredients();
+    } else if (searchBy === "firstLetter") {
+      searchByFirstLetter();
     }
+    console.log(searchTerm);
   }, [searchTerm]);
+
+  useEffect(() => {
+    setSearchTerm("");
+  }, [searchBy]);
 
   useEffect(() => {
     setCocktailDirectory(props.cocktails);
@@ -104,25 +118,75 @@ function CocktailDirectory(props) {
     setCocktailDirectory(filteredCocktails);
   };
 
+  const searchByFirstLetter = () => {
+    if (searchTerm) {
+      const filteredCocktails = props.cocktails.filter(
+        (cocktail) => cocktail.name[0].toUpperCase() === searchTerm
+      );
+      setCocktailDirectory(filteredCocktails);
+    } else setCocktailDirectory(props.cocktails);
+  };
+
   if (!props.cocktails && window.location.pathname === "mycocktails") {
     return <div>You have not added any cocktails.</div>;
   } else {
     return (
       <div className="container py-3">
         <div className="row">
-          <div className="col-5 col-sm-4 col-md-3 col-xl-2">
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search"
-            />{" "}
-          </div>
-          <div className="col-5 col-sm-4 col-md-3 col-xl-2">
+          <div className="col col-sm-6 col-md-4 col-xl-3">
+            <Label htmlFor="searchBy">Search by: </Label>{" "}
             <select id="searchBy" onChange={(e) => setSearchBy(e.target.value)}>
-              <option value="byName">By Name</option>
-              <option value="byIngredients">By Ingredients</option>
+              <option value="byName">Name</option>
+              <option value="byIngredients">Ingredients</option>
+              <option value="firstLetter">First Letter</option>
             </select>
           </div>
+          {searchBy !== "firstLetter" ? (
+            <div className="col col-sm-6 col-md-4 col-xl-3">
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search"
+              />{" "}
+            </div>
+          ) : (
+            <div className="col col-sm-6 col-md-4 col-xl-3">
+              <Label htmlFor="letter">Letter:</Label>{" "}
+              <select
+                id="letter"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="..."
+              >
+                <option value="">...</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+                <option value="I">I</option>
+                <option value="J">J</option>
+                <option value="K">K</option>
+                <option value="L">L</option>
+                <option value="M">M</option>
+                <option value="N">N</option>
+                <option value="O">O</option>
+                <option value="P">P</option>
+                <option value="Q">Q</option>
+                <option value="R">R</option>
+                <option value="S">S</option>
+                <option value="T">T</option>
+                <option value="U">U</option>
+                <option value="V">V</option>
+                <option value="W">W</option>
+                <option value="X">X</option>
+                <option value="Y">Y</option>
+                <option value="Z">Z</option>
+              </select>
+            </div>
+          )}
           {window.location.pathname === "/mycocktails" ? (
             <div className="col">
               <Button onClick={() => navigate("/mycocktails/cocktailcreator")}>
