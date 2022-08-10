@@ -311,10 +311,6 @@ export const deleteUserFavorite = async (cocktailInfo) => {
 
 // *** User Bar ***
 
-// export const getUserBar = async () => {
-
-// }
-
 export const updateUserBar = async (updatedUserBar) => {
   try {
     const response = await fetch(baseUrl + "users/userBar", {
