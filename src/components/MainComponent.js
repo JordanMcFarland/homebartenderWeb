@@ -4,7 +4,7 @@ import CocktailInfo from "./CocktailInfoComponent";
 import CocktailCreator from "./CocktailCreatorComponent";
 import Header from "./HeaderComponent";
 import FavoriteComponent from "./FavoriteComponent";
-import MyBarComponent from "./MyBarComponent";
+import MyBar from "./MyBar";
 import LoginComponent from "./LoginComponent";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { fetchCocktails, fetchIngredients } from "../helpers/airtable";
@@ -16,11 +16,15 @@ import {
   postUserFavorite,
   deleteUserFavorite,
 } from "../helpers/homebartenderServer";
+import UserCocktailList from "./UserCocktailList";
+import UserCocktailInfo from "./UserCocktailInfo";
+import CocktailEditor from "./UserCocktailEditor";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(false);
   const [cocktails, setCocktails] = useState([]);
+  const [uncategorizedIngredients, setUncategorizedIngredients] = useState([]);
   const [ingredients, setIngredients] = useState({});
   const [ingredientCategories, setIngredientCategories] = useState([]);
   const [favorites, setFavorites] = useState([]);
@@ -64,10 +68,13 @@ const Main = ({ history }) => {
 
         // Create a list object with {category: ingredient array} pairs
         const listObj = {};
-        //console.log(list);
+        const uncategorizedList = [];
+
         list.records.forEach((record) => {
           const _id = record.id;
           const { type, name } = record.fields;
+
+          uncategorizedList.push(name);
 
           if (!listObj[type]) {
             listObj[type] = [];
@@ -85,6 +92,7 @@ const Main = ({ history }) => {
         });
 
         // Set ingredient & ingredient category state
+        setUncategorizedIngredients(uncategorizedList.sort());
         setIngredients((prevState) => ({ ...prevState, ...listObj }));
         setIngredientCategories((prevState) => [...prevState, ...keyArr]);
       } catch (e) {
@@ -119,18 +127,26 @@ const Main = ({ history }) => {
   };
 
   const handleUpdateUserCocktail = async (userCocktailId, editedCocktail) => {
-    const updatedUserCocktails = await updateUserCocktail(
-      userCocktailId,
-      editedCocktail
-    );
-    setUser({ ...user, userCocktails: updatedUserCocktails });
+    let updatedUserCocktails = [];
+    const response = await updateUserCocktail(userCocktailId, editedCocktail);
+    updatedUserCocktails = response.userCocktails.sort((a, b) => {
+      return a.name > b.name;
+    });
+
+    const userData = { ...user, userCocktails: updatedUserCocktails };
+    setUser(userData);
   };
 
   //Should this check to see if the cocktail is in favorites and delete it?
-  const handleDeleteUserCocktail = async (userCocktailId) => {
-    const updatedUserCocktails = await deleteUserCocktail(userCocktailId);
-    setUser({ ...user, userCocktails: updatedUserCocktails });
-    navigate("/mycocktails");
+  const handleDeleteUserCocktail = async (_id) => {
+    let updatedUserCocktails = [];
+    const response = await deleteUserCocktail(_id);
+    updatedUserCocktails = response.userCocktails.sort((a, b) => {
+      return a.name > b.name;
+    });
+
+    const userData = { ...user, userCocktails: updatedUserCocktails };
+    setUser(userData);
   };
 
   const handleGetUserFavorites = async () => {
@@ -227,9 +243,9 @@ const Main = ({ history }) => {
           <Route
             path="/mycocktails/:_id"
             element={
-              <CocktailInfo
-                cocktails={user?.userCocktails}
-                onDeleteCocktail={handleDeleteUserCocktail}
+              <UserCocktailInfo
+                userCocktails={user?.userCocktails}
+                onDeleteUserCocktail={handleDeleteUserCocktail}
                 onUpdateUserCocktail={handleUpdateUserCocktail}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
@@ -242,6 +258,7 @@ const Main = ({ history }) => {
             path="/mycocktails/cocktailcreator"
             element={
               <CocktailCreator
+                uncategorizedIngredients={uncategorizedIngredients}
                 ingredients={ingredients}
                 ingredientCategories={ingredientCategories}
                 userCocktails={user?.userCocktails}
@@ -250,9 +267,22 @@ const Main = ({ history }) => {
             }
           />
           <Route
+            path="/cocktaileditor/:_id"
+            element={
+              <CocktailEditor
+                uncategorizedIngredients={uncategorizedIngredients}
+                ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
+                userCocktails={user?.userCocktails}
+                onUpdateUserCocktail={handleUpdateUserCocktail}
+                onDeleteUserCocktail={handleDeleteUserCocktail}
+              />
+            }
+          />
+          <Route
             key="mycocktails"
             path="/mycocktails"
-            element={<CocktailDirectory cocktails={user?.userCocktails} />}
+            element={<UserCocktailList userCocktails={user?.userCocktails} />}
           />
           <Route
             path="/favorites"
@@ -267,12 +297,11 @@ const Main = ({ history }) => {
           <Route
             path="/mybar"
             element={
-              <MyBarComponent
+              <MyBar
                 ingredients={ingredients}
                 ingredientCategories={ingredientCategories}
                 cocktails={cocktails}
-                myBar={myBar}
-                setMyBar={setMyBar}
+                user={user}
               />
             }
           />

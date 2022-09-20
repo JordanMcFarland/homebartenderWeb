@@ -135,82 +135,51 @@ export const getUserCocktails = async () => {
 };
 
 export const deleteUserCocktail = async (userCocktailId) => {
-  try {
-    const response = await fetch(
-      baseUrl + `users/usercocktails/${userCocktailId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const error = new Error(
-        `Error ${response.status}: ${response.statusText}`
-      );
-      error.response = response;
-      throw error;
+  const response = await fetch(
+    baseUrl + `users/usercocktails/${userCocktailId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     }
+  );
 
-    const json = await response.json();
+  const json = await response.json();
 
-    if (json) {
-      return json.sort((a, b) =>
-        a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-      );
-    } else {
-      const error = new Error("Error " + json.status);
-      error.response = json;
-      throw error;
-    }
-  } catch (err) {
-    console.error(err);
+  if (response.ok) {
+    return json;
+  } else {
+    const error = json.error;
+    throw new Error(error);
   }
 };
 
 export const updateUserCocktail = async (userCocktailId, editedCocktail) => {
-  try {
-    const response = await fetch(
-      baseUrl + `users/usercocktails/${userCocktailId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          name: editedCocktail.name,
-          requiredIngredients: editedCocktail.requiredIngredients,
-          recipe: editedCocktail.recipe,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const error = new Error(
-        `Error ${response.status}: ${response.statusText}`
-      );
-      error.response = response;
-      throw error;
+  const response = await fetch(
+    baseUrl + `users/usercocktails/${userCocktailId}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        name: editedCocktail.name,
+        requiredIngredients: editedCocktail.requiredIngredients,
+        recipe: editedCocktail.recipe,
+      }),
     }
+  );
 
-    const json = await response.json();
-    console.log(json);
+  const json = await response.json();
 
-    if (json) {
-      return json.sort((a, b) =>
-        a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1
-      );
-    } else {
-      const error = new Error("Error " + json.status);
-      error.response = json;
-      throw error;
-    }
-  } catch (err) {
-    console.error(err);
+  if (response.ok) {
+    return json;
+  } else {
+    const error = json.error;
+    throw new Error(error);
   }
 };
 

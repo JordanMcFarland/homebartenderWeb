@@ -9,18 +9,12 @@ import {
   Label,
 } from "reactstrap";
 
-function RenderDirectoryItem({ cocktail, ...props }) {
+function UserListItem({ cocktail, ...props }) {
   return (
     <Card style={{ minHeight: 60 }}>
-      <Link
-        to={`/${!cocktail.userId ? "directory" : "mycocktails"}/${
-          cocktail._id
-        }`}
-      >
-        {cocktail.image ? (
+      <Link to={`/mycocktails/${cocktail._id}`}>
+        {cocktail.image && (
           <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
-        ) : (
-          <div />
         )}
         <CardImgOverlay>
           <CardTitle>{cocktail.name}</CardTitle>
@@ -30,10 +24,10 @@ function RenderDirectoryItem({ cocktail, ...props }) {
   );
 }
 
-function CocktailDirectory(props) {
+function UserCocktailList(props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("byName");
-  const [cocktailDirectory, setCocktailDirectory] = useState(props.cocktails);
+  const [userCocktailList, setUserCocktailList] = useState(props.userCocktails);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,29 +45,29 @@ function CocktailDirectory(props) {
   }, [searchBy]);
 
   useEffect(() => {
-    setCocktailDirectory(props.cocktails);
-  }, [props.cocktails]);
+    setUserCocktailList(props.userCocktails);
+  }, [props.userCocktails]);
 
-  const directory = cocktailDirectory.map((cocktail) => {
+  const list = userCocktailList.map((cocktail) => {
     return (
       <div key={cocktail._id} className="col-md-5 m-1">
-        <RenderDirectoryItem cocktail={cocktail} />
+        <UserListItem cocktail={cocktail} />
       </div>
     );
   });
 
   const searchByName = () => {
-    const filteredCocktails = props.cocktails.filter((cocktail) => {
+    const filteredCocktails = props.userCocktails.filter((cocktail) => {
       if (searchBy === "byName") {
         return cocktail.name.toUpperCase().includes(searchTerm.toUpperCase());
       }
       if (searchBy === "byIngredients") {
         return cocktail.requiredIngredients.some((ingredient) =>
-          ingredient.toUpperCase().includes(searchTerm.toUpperCase())
+          ingredient.name.toUpperCase().includes(searchTerm.toUpperCase())
         );
       }
     });
-    setCocktailDirectory(filteredCocktails);
+    setUserCocktailList(filteredCocktails);
   };
 
   const searchByIngredients = () => {
@@ -83,7 +77,7 @@ function CocktailDirectory(props) {
     //empty array to store filtered cocktails
     const filteredCocktails = [];
 
-    props.cocktails.forEach((cocktail) => {
+    props.userCocktails.forEach((cocktail) => {
       // Destructure ingredients out of cocktail object for code readability
       const { requiredIngredients } = cocktail;
 
@@ -96,7 +90,7 @@ function CocktailDirectory(props) {
         // Check each search term to see if there is a cocktail ingredient that contains it
         if (
           !requiredIngredients.some((ingredient) =>
-            ingredient.toUpperCase().includes(term)
+            ingredient.name.toUpperCase().includes(term)
           )
         ) {
           // If not, set the boolean to false to flag that this cocktail should not go in the list
@@ -114,19 +108,19 @@ function CocktailDirectory(props) {
     });
 
     // Finally, set state with the array of cocktails
-    setCocktailDirectory(filteredCocktails);
+    setUserCocktailList(filteredCocktails);
   };
 
   const searchByFirstLetter = () => {
     if (searchTerm) {
-      const filteredCocktails = props.cocktails.filter(
+      const filteredCocktails = props.userCocktails.filter(
         (cocktail) => cocktail.name[0].toUpperCase() === searchTerm
       );
-      setCocktailDirectory(filteredCocktails);
-    } else setCocktailDirectory(props.cocktails);
+      setUserCocktailList(filteredCocktails);
+    } else setUserCocktailList(props.userCocktails);
   };
 
-  if (!props.cocktails && window.location.pathname === "mycocktails") {
+  if (!props.userCocktails) {
     return <div>You have not added any cocktails.</div>;
   } else {
     return (
@@ -186,25 +180,20 @@ function CocktailDirectory(props) {
               </select>
             </div>
           )}
-          {window.location.pathname === "/mycocktails" ? (
-            <div className="col">
-              <Button onClick={() => navigate("/mycocktails/cocktailcreator")}>
-                Create a Cocktail
-              </Button>
-            </div>
-          ) : (
-            <></>
-          )}
+          <div className="col">
+            <Button onClick={() => navigate("/mycocktails/cocktailcreator")}>
+              Create a Cocktail
+            </Button>
+          </div>
         </div>
         <div className="row pt-3">
-          {window.location.pathname === "/mycocktails" &&
-          cocktailDirectory.length <= 0
+          {userCocktailList.length <= 0
             ? "You have not added any cocktails."
-            : directory}
+            : list}
         </div>
       </div>
     );
   }
 }
 
-export default CocktailDirectory;
+export default UserCocktailList;

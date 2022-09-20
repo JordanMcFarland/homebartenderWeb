@@ -31,7 +31,7 @@ const FavoriteComponent = ({ onGetUserFavorites, ...props }) => {
           </Card>
         </div>
       );
-    } else return <div key={cocktail._id} />;
+    } else return;
   });
 
   if (props.favorites.length) {

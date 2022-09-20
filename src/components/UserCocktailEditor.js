@@ -1,29 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactSelect from "react-select";
-import {
-  Form,
-  FormGroup,
-  Button,
-  Collapse,
-  Label,
-  Input,
-  Card,
-} from "reactstrap";
-import { postCocktail } from "../helpers/homebartenderServer";
+import { Form, FormGroup, Button, Label, Input, Card } from "reactstrap";
 
-function CocktailCreator({
+function UserCocktailEditor({
   ingredients,
   ingredientCategories,
   uncategorizedIngredients,
   ...props
 }) {
-  const [newCocktail, setNewCocktail] = useState({
+  const { _id } = useParams();
+  const navigate = useNavigate();
+  const [editingCocktailInfo, setEditingCocktailInfo] = useState({
     name: "",
     requiredIngredients: [],
     recipe: "",
     image: "",
   });
-  const [tempIngredients, setTempIngredients] = useState([{ _id: 0 }]);
+  const [tempIngredients, setTempIngredients] = useState([]);
   const [nextIngredientId, setNextIngredientId] = useState(1);
 
   useEffect(() => {
@@ -39,8 +33,8 @@ function CocktailCreator({
         };
         trimmedIngredients.push(trimmedIngredient);
       });
-      setNewCocktail({
-        ...newCocktail,
+      setEditingCocktailInfo({
+        ...editingCocktailInfo,
         requiredIngredients: trimmedIngredients,
       });
     };
@@ -48,9 +42,37 @@ function CocktailCreator({
     saveIngredients();
   }, [tempIngredients]);
 
-  const updateNewCocktail = (e) => {
+  useEffect(() => {
+    function populateCocktailInfo() {
+      let counter = 0;
+      const cocktail = props.userCocktails?.filter(
+        (cocktail) => cocktail._id === _id
+      )[0];
+
+      // Get cocktail info and populate editing cocktail state
+      if (cocktail) {
+        const { name, requiredIngredients, recipe, image } = cocktail;
+        setEditingCocktailInfo({ name, requiredIngredients, recipe, image });
+
+        // get ingredients and give them each an index, update tempingredients state
+        const indexedIngredients = cocktail.requiredIngredients.map(
+          (ingredient) => {
+            const ingredientWithId = { ...ingredient, _id: counter };
+            counter++;
+            return ingredientWithId;
+          }
+        );
+
+        setNextIngredientId(counter);
+        setTempIngredients(indexedIngredients);
+      }
+    }
+    populateCocktailInfo();
+  }, []);
+
+  const updateEditingCocktailInfo = (e) => {
     const { name, value } = e.target;
-    setNewCocktail({ ...newCocktail, [name]: value });
+    setEditingCocktailInfo({ ...editingCocktailInfo, [name]: value });
   };
 
   const addIngredient = () => {
@@ -65,34 +87,39 @@ function CocktailCreator({
     setTempIngredients(newTempIngredientsArr);
   };
 
-  const commitCocktail = async (e) => {
+  const updateUserCocktail = async (e) => {
     e.preventDefault();
     try {
-      const response = await postCocktail(newCocktail);
-      if (response) {
-        alert(newCocktail.name + " has been added to the cocktail list.");
-        props.onGetUserCocktails();
-      } else {
-        const err = new Error(
-          "Could not add your cocktail. Make sure name, ingredient, and recipe fields are filled."
-        );
-        alert(err);
-      }
+      await props.onUpdateUserCocktail(_id, editingCocktailInfo);
+      navigate("/mycocktails");
     } catch (err) {
-      console.error(err);
+      alert(err);
+    }
+  };
+
+  const deleteUserCocktail = async (_id) => {
+    try {
+      await props.onDeleteUserCocktail(_id);
+      navigate("/mycocktails");
+    } catch (err) {
+      alert(err);
     }
   };
 
   const getImage = (e) => {
     console.log(e.target.files[0].name);
     let img = e.target.files[0];
-    setNewCocktail({ ...newCocktail, image: URL.createObjectURL(img) });
+    setEditingCocktailInfo({
+      ...editingCocktailInfo,
+      image: URL.createObjectURL(img),
+    });
   };
 
   const renderIngredientContainers = tempIngredients.map((ingredient) => (
     <IngredientContainer
       key={ingredient._id}
       deleteIngredient={deleteIngredient}
+      ingredient={ingredient}
       ingredientId={ingredient._id}
       tempIngredients={tempIngredients}
       setTempIngredients={setTempIngredients}
@@ -108,7 +135,7 @@ function CocktailCreator({
           <hr />
         </div>
         <div className="col-md-10">
-          <Form onSubmit={commitCocktail}>
+          <Form onSubmit={updateUserCocktail}>
             <FormGroup>
               <Label htmlFor="cocktailName">Cocktail Name: </Label>
               <Input
@@ -117,8 +144,8 @@ function CocktailCreator({
                 name="name"
                 className="form-control"
                 placeholder="Cocktail Name"
-                value={newCocktail.name}
-                onChange={updateNewCocktail}
+                value={editingCocktailInfo.name}
+                onChange={updateEditingCocktailInfo}
               />
             </FormGroup>
             <p>Ingredients:</p>
@@ -134,8 +161,8 @@ function CocktailCreator({
                 name="recipe"
                 className="form-control"
                 placeholder="Recipe"
-                value={newCocktail.recipe}
-                onChange={updateNewCocktail}
+                value={editingCocktailInfo.recipe}
+                onChange={updateEditingCocktailInfo}
               />
             </FormGroup>
             <FormGroup>
@@ -150,18 +177,21 @@ function CocktailCreator({
             </FormGroup>
             <FormGroup row>
               <div className="col">
-                <Button type="submit" color="primary">
-                  Submit
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => console.log(tempIngredients)}
+                <Button
+                  style={{ float: "right" }}
+                  type="submit"
+                  color="primary"
                 >
-                  Ingredients
-                </button>
-                <button type="button" onClick={() => console.log(newCocktail)}>
-                  Cocktail
-                </button>
+                  Save Changes
+                </Button>
+                <Button
+                  style={{ float: "right", marginRight: 16 }}
+                  type="button"
+                  color="secondary"
+                  onClick={() => deleteUserCocktail(_id)}
+                >
+                  Delete Cocktail
+                </Button>
               </div>
             </FormGroup>
           </Form>
@@ -173,17 +203,18 @@ function CocktailCreator({
 
 function IngredientContainer({
   deleteIngredient,
+  ingredient,
   ingredientId,
   tempIngredients,
   setTempIngredients,
   uncategorizedIngredients,
 }) {
   const [ingredientInfo, setIngredientInfo] = useState({
-    name: "",
-    amount: "",
-    unit: "",
-    type: "Core Ingredient",
-    custom: false,
+    name: ingredient.name ? ingredient.name : "",
+    amount: ingredient.amount ? ingredient.amount : "",
+    unit: ingredient.unit ? ingredient.unit : "",
+    type: ingredient.type ? ingredient.type : "Core Ingredient",
+    custom: ingredient.custom ? ingredient.custom : false,
   });
   const [units, setUnits] = useState([
     { value: "oz", label: "oz" },
@@ -193,8 +224,8 @@ function IngredientContainer({
     { value: "dashes", label: "dashes" },
   ]);
   const [ingredientOptions, setIngredientOptions] = useState(
-    uncategorizedIngredients.map((ingredient) => {
-      return { value: ingredient, label: ingredient };
+    uncategorizedIngredients.map((ing) => {
+      return { value: ing, label: ing };
     })
   );
 
@@ -203,9 +234,7 @@ function IngredientContainer({
   }, [ingredientInfo]);
 
   const updateTempIngredients = () => {
-    const index = tempIngredients.findIndex(
-      (ingredient) => ingredient._id === ingredientId
-    );
+    const index = tempIngredients.findIndex((ing) => ing._id === ingredientId);
     const arr = [...tempIngredients];
     arr[index] = { ...arr[index], ...ingredientInfo };
     setTempIngredients(arr);
@@ -240,7 +269,7 @@ function IngredientContainer({
               id={"ingName" + ingredientId}
               options={ingredientOptions}
               styles={dropdownStyles}
-              defaultValue={ingredientInfo.name}
+              defaultInputValue={ingredientInfo.name}
               onChange={(name) => updateIngredientInfo("name", name.value)}
             />
           )}
@@ -262,6 +291,7 @@ function IngredientContainer({
               onChange={(selectedItem) =>
                 updateIngredientInfo("unit", selectedItem.value)
               }
+              defaultInputValue={ingredientInfo.unit}
               styles={dropdownStyles}
             />
           </div>
@@ -269,6 +299,7 @@ function IngredientContainer({
         <div style={{ marginTop: 8 }}>
           <Label htmlFor={"custom" + ingredientId}>Custom</Label>
           <Input
+            checked={ingredientInfo.custom}
             className="mx-3"
             type="checkbox"
             name={"custom" + ingredientId}
@@ -324,4 +355,4 @@ const dropdownStyles = {
   }),
 };
 
-export default CocktailCreator;
+export default UserCocktailEditor;

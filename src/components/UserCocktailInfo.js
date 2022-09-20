@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Card,
   CardImg,
@@ -14,6 +14,16 @@ import {
 
 function RenderCocktail({ cocktail, ...props }) {
   const [buttonDropdownIsOpen, toggleButtonDropDown] = useState(false);
+  const navigate = useNavigate();
+
+  const deleteUserCocktail = async (_id) => {
+    try {
+      await props.onDeleteUserCocktail(_id);
+      navigate("/mycocktails");
+    } catch (err) {
+      alert(err);
+    }
+  };
 
   return (
     <div className={"col-lg-7 col-md-9 mx-auto"}>
@@ -35,6 +45,14 @@ function RenderCocktail({ cocktail, ...props }) {
                     ? "Unfavorite"
                     : "Favorite"}
                 </DropdownItem>
+                <DropdownItem
+                  onClick={() => navigate(`/cocktaileditor/${cocktail._id}`)}
+                >
+                  Edit
+                </DropdownItem>
+                <DropdownItem onClick={() => deleteUserCocktail(cocktail._id)}>
+                  Delete
+                </DropdownItem>
               </DropdownMenu>
             </ButtonDropdown>
           </div>
@@ -44,11 +62,12 @@ function RenderCocktail({ cocktail, ...props }) {
           <CardSubtitle className="mb-2 text-muted">Ingredients:</CardSubtitle>
           <ul>
             {cocktail.requiredIngredients.map((ingredient, index) => {
-              return (
-                <li key={index}>
-                  {ingredient[0].toUpperCase() + ingredient.slice(1)}
-                </li>
-              );
+              const ingredientString =
+                `${ingredient.amount} ${ingredient.unit} ${ingredient.name}`.replace(
+                  /  +/g,
+                  " "
+                );
+              return <li key={index}>{ingredientString}</li>;
             })}
           </ul>
           {cocktail.recipe}
@@ -58,10 +77,10 @@ function RenderCocktail({ cocktail, ...props }) {
   );
 }
 
-function CocktailInfo(props) {
+function UserCocktailInfo(props) {
   let { _id } = useParams();
-  if (props.cocktails) {
-    const cocktail = props.cocktails.filter((cocktail) => {
+  if (props.userCocktails) {
+    const cocktail = props.userCocktails.filter((cocktail) => {
       return cocktail._id.toString() === _id;
     })[0];
 
@@ -71,6 +90,8 @@ function CocktailInfo(props) {
           <div className="row">
             <RenderCocktail
               cocktail={cocktail}
+              onDeleteUserCocktail={props.onDeleteUserCocktail}
+              onUpdateUserCocktail={props.onUpdateUserCocktail}
               toggleFavorite={props.toggleFavorite}
               favorites={props.favorites}
               ingredients={props.ingredients}
@@ -85,4 +106,4 @@ function CocktailInfo(props) {
   return <div />;
 }
 
-export default CocktailInfo;
+export default UserCocktailInfo;
