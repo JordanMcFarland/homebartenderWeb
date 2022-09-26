@@ -24,7 +24,7 @@ function UserListItem({ cocktail, ...props }) {
   );
 }
 
-function UserCocktailList(props) {
+function MyCocktailList(props) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchBy, setSearchBy] = useState("byName");
   const [userCocktailList, setUserCocktailList] = useState(props.userCocktails);
@@ -196,4 +196,4 @@ function UserCocktailList(props) {
   }
 }
 
-export default UserCocktailList;
+export default MyCocktailList;

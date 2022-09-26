@@ -15,10 +15,12 @@ import {
   getUserFavorites,
   postUserFavorite,
   deleteUserFavorite,
+  updateUserBar,
 } from "../helpers/homebartenderServer";
-import UserCocktailList from "./UserCocktailList";
-import UserCocktailInfo from "./UserCocktailInfo";
-import CocktailEditor from "./UserCocktailEditor";
+import UserCocktailList from "./MyCocktailList";
+import UserCocktailInfo from "./MyCocktailInfo";
+import CocktailEditor from "./MyCocktailEditor";
+import MyBarEditor from "./MyBarEditor";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
@@ -215,6 +217,12 @@ const Main = ({ history }) => {
       );
   };
 
+  const handleUpdateUserBar = async (updatedUserBar) => {
+    const response = await updateUserBar(updatedUserBar);
+    const userData = { ...user, userBar: response.updatedUserBar };
+    setUser(userData);
+  };
+
   if (err) {
     return <h1>Something went wrong. {err}</h1>;
   }
@@ -302,6 +310,17 @@ const Main = ({ history }) => {
                 ingredientCategories={ingredientCategories}
                 cocktails={cocktails}
                 user={user}
+              />
+            }
+          />
+          <Route
+            path="/mybar/editor"
+            element={
+              <MyBarEditor
+                user={user}
+                ingredients={ingredients}
+                ingredientCategories={ingredientCategories}
+                onUpdateUserBar={handleUpdateUserBar}
               />
             }
           />

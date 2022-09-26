@@ -77,7 +77,7 @@ function RenderCocktail({ cocktail, ...props }) {
   );
 }
 
-function UserCocktailInfo(props) {
+function MyCocktailInfo(props) {
   let { _id } = useParams();
   if (props.userCocktails) {
     const cocktail = props.userCocktails.filter((cocktail) => {
@@ -106,4 +106,4 @@ function UserCocktailInfo(props) {
   return <div />;
 }
 
-export default UserCocktailInfo;
+export default MyCocktailInfo;

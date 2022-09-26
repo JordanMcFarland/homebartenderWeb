@@ -8,7 +8,7 @@ import {
   CardImgOverlay,
   CardTitle,
 } from "reactstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { updateUserBar } from "../helpers/homebartenderServer";
 
 function MyBar({ ingredients, ingredientCategories, cocktails, user }) {
@@ -16,6 +16,7 @@ function MyBar({ ingredients, ingredientCategories, cocktails, user }) {
   const [editingMyBar, toggleEditMyBar] = useState(false);
   const [craftableList, setCraftableList] = useState([]);
   const [userBarCategories, setUserBarCategories] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const newCategories = Object.keys(user.userBar);
@@ -80,11 +81,11 @@ function MyBar({ ingredients, ingredientCategories, cocktails, user }) {
           style={{ background: "#B70D29" }}
           onClick={() => console.log("go to craftable list")}
         >
-          What can I make?"
+          What can I make?
         </Button>
         <Button
           className="col m-1"
-          onClick={() => console.log("go to my bar editor")}
+          onClick={() => navigate("/mybar/editor")}
           color="secondary"
         >
           Edit My Bar

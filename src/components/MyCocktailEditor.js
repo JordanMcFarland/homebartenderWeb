@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ReactSelect from "react-select";
 import { Form, FormGroup, Button, Label, Input, Card } from "reactstrap";
 
-function UserCocktailEditor({
+function MyCocktailEditor({
   ingredients,
   ingredientCategories,
   uncategorizedIngredients,
@@ -355,4 +355,4 @@ const dropdownStyles = {
   }),
 };
 
-export default UserCocktailEditor;
+export default MyCocktailEditor;
