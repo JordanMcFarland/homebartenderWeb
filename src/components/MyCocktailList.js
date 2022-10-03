@@ -16,9 +16,17 @@ function UserListItem({ cocktail, ...props }) {
         {cocktail.image && (
           <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
         )}
-        <CardImgOverlay>
-          <CardTitle>{cocktail.name}</CardTitle>
-        </CardImgOverlay>
+        <CardTitle
+          style={{
+            marginTop: 16,
+            marginLeft: 8,
+            display: "inline-flex",
+            paddingLeft: 8,
+            paddingRight: 8,
+          }}
+        >
+          {cocktail.name}
+        </CardTitle>
       </Link>
     </Card>
   );

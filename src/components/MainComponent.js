@@ -21,6 +21,7 @@ import UserCocktailList from "./MyCocktailList";
 import UserCocktailInfo from "./MyCocktailInfo";
 import CocktailEditor from "./MyCocktailEditor";
 import MyBarEditor from "./MyBarEditor";
+import CraftableCocktails from "./CraftableCocktails";
 
 const Main = ({ history }) => {
   const [loading, setLoading] = useState(true);
@@ -179,6 +180,7 @@ const Main = ({ history }) => {
           ` could not add cocktail: ${cocktailInfo} to favorites because it's already a favorite.`;
         throw err;
       } else {
+        setUser({ ...user, userFavorites: response.userFavorites });
         handleGetUserFavorites();
       }
     } catch (err) {
@@ -195,6 +197,7 @@ const Main = ({ history }) => {
           ` could not delete cocktail: ${cocktailInfo} from you favorites.`;
         throw err;
       } else {
+        setUser({ ...user, userFavorites: response.userFavorites });
         handleGetUserFavorites();
       }
     } catch (err) {
@@ -236,6 +239,7 @@ const Main = ({ history }) => {
             path="/directory/:_id"
             element={
               <CocktailInfo
+                user={user}
                 cocktails={cocktails}
                 toggleFavorite={toggleFavorite}
                 favorites={favorites}
@@ -252,6 +256,7 @@ const Main = ({ history }) => {
             path="/mycocktails/:_id"
             element={
               <UserCocktailInfo
+                user={user}
                 userCocktails={user?.userCocktails}
                 onDeleteUserCocktail={handleDeleteUserCocktail}
                 onUpdateUserCocktail={handleUpdateUserCocktail}
@@ -323,6 +328,10 @@ const Main = ({ history }) => {
                 onUpdateUserBar={handleUpdateUserBar}
               />
             }
+          />
+          <Route
+            path="/mybar/craftablecocktails"
+            element={<CraftableCocktails user={user} cocktails={cocktails} />}
           />
           <Route
             path="/login"

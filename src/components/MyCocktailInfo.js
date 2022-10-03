@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as emptyHeart } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Card,
@@ -14,7 +17,16 @@ import {
 
 function RenderCocktail({ cocktail, ...props }) {
   const [buttonDropdownIsOpen, toggleButtonDropDown] = useState(false);
+  const [favorite, setFavorite] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isFavorite = props.user.userFavorites.some(
+      (favorite) => favorite._id.toString() === cocktail._id.toString()
+    );
+
+    setFavorite(isFavorite);
+  }, [props.user.userFavorites]);
 
   const deleteUserCocktail = async (_id) => {
     try {
@@ -37,14 +49,6 @@ function RenderCocktail({ cocktail, ...props }) {
             >
               <DropdownToggle caret />
               <DropdownMenu>
-                <DropdownItem onClick={() => props.toggleFavorite(cocktail)}>
-                  {props.favorites.some(
-                    (favorite) =>
-                      favorite._id.toString() === cocktail._id.toString()
-                  )
-                    ? "Unfavorite"
-                    : "Favorite"}
-                </DropdownItem>
                 <DropdownItem
                   onClick={() => navigate(`/cocktaileditor/${cocktail._id}`)}
                 >
@@ -56,6 +60,17 @@ function RenderCocktail({ cocktail, ...props }) {
               </DropdownMenu>
             </ButtonDropdown>
           </div>
+        </div>
+        <div
+          className="row"
+          style={{ marginTop: 8, flexDirection: "row-reverse" }}
+        >
+          <FontAwesomeIcon
+            className="col-1"
+            icon={favorite ? faHeart : emptyHeart}
+            fontSize={24}
+            onClick={() => props.toggleFavorite(cocktail)}
+          />
         </div>
         <CardBody className="mx-3">
           <CardImg src={cocktail.image} width="30"></CardImg>
@@ -97,6 +112,7 @@ function MyCocktailInfo(props) {
               ingredients={props.ingredients}
               ingredientCategories={props.ingredientCategories}
               _id={_id}
+              user={props.user}
             />
           </div>
         </div>

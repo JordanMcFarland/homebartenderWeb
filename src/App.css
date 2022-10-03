@@ -21,9 +21,10 @@ h2 {
   color: #B70D29;
 }
 
-.card-img-overlay .card-title {
+ .card-title {
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
 
 .row-content {

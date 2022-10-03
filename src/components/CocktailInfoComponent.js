@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as emptyHeart } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -14,6 +17,15 @@ import {
 
 function RenderCocktail({ cocktail, ...props }) {
   const [buttonDropdownIsOpen, toggleButtonDropDown] = useState(false);
+  const [favorite, setFavorite] = useState(null);
+
+  useEffect(() => {
+    const isFavorite = props.user.userFavorites.some(
+      (favorite) => favorite._id.toString() === cocktail._id.toString()
+    );
+
+    setFavorite(isFavorite);
+  }, [props.user.userFavorites]);
 
   return (
     <div className={"col-lg-7 col-md-9 mx-auto"}>
@@ -38,6 +50,17 @@ function RenderCocktail({ cocktail, ...props }) {
               </DropdownMenu>
             </ButtonDropdown>
           </div>
+        </div>
+        <div
+          className="row"
+          style={{ marginTop: 8, flexDirection: "row-reverse" }}
+        >
+          <FontAwesomeIcon
+            className="col-1"
+            icon={favorite ? faHeart : emptyHeart}
+            fontSize={24}
+            onClick={() => props.toggleFavorite(cocktail)}
+          />
         </div>
         <CardBody className="mx-3">
           <CardImg src={cocktail.image} width="30"></CardImg>
@@ -70,6 +93,7 @@ function CocktailInfo(props) {
         <div className="container py-3">
           <div className="row">
             <RenderCocktail
+              user={props.user}
               cocktail={cocktail}
               toggleFavorite={props.toggleFavorite}
               favorites={props.favorites}

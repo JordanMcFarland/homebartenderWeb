@@ -79,7 +79,7 @@ function MyBar({ ingredients, ingredientCategories, cocktails, user }) {
         <Button
           className="col m-1"
           style={{ background: "#B70D29" }}
-          onClick={() => console.log("go to craftable list")}
+          onClick={() => navigate("/mybar/craftablecocktails")}
         >
           What can I make?
         </Button>

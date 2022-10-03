@@ -1,32 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Button,
-  Card,
-  CardImg,
-  CardImgOverlay,
-  CardTitle,
-  Label,
-} from "reactstrap";
+import { Button, Card, CardImg, CardTitle, Label } from "reactstrap";
 
 function RenderDirectoryItem({ cocktail, ...props }) {
   return (
-    <Card style={{ minHeight: 60 }}>
-      <Link
-        to={`/${!cocktail.userId ? "directory" : "mycocktails"}/${
-          cocktail._id
-        }`}
-      >
+    <Link
+      to={`/${!cocktail.userId ? "directory" : "mycocktails"}/${cocktail._id}`}
+    >
+      <Card style={{ minHeight: 60 }}>
         {cocktail.image ? (
           <CardImg src={cocktail.image} alt={cocktail.name} width="30" />
         ) : (
           <div />
         )}
-        <CardImgOverlay>
-          <CardTitle>{cocktail.name}</CardTitle>
-        </CardImgOverlay>
-      </Link>
-    </Card>
+        <CardTitle
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 8,
+            display: "inline-flex",
+            paddingLeft: 8,
+            paddingRight: 8,
+          }}
+        >
+          {cocktail.name}
+        </CardTitle>
+      </Card>
+    </Link>
   );
 }
 

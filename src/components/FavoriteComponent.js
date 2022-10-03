@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { Card, CardImg, CardImgOverlay, CardTitle } from "reactstrap";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 const FavoriteComponent = ({ onGetUserFavorites, ...props }) => {
   useEffect(() => {
@@ -12,6 +14,12 @@ const FavoriteComponent = ({ onGetUserFavorites, ...props }) => {
       return (
         <div key={cocktail._id} className="col-md-5 m-1">
           <Card style={{ minHeight: 60 }}>
+            {cocktail.userId && (
+              <FontAwesomeIcon
+                icon={faUser}
+                style={{ position: "absolute", right: 8, top: 20 }}
+              />
+            )}
             <Link
               to={
                 cocktail.userId
@@ -24,9 +32,17 @@ const FavoriteComponent = ({ onGetUserFavorites, ...props }) => {
               ) : (
                 <div />
               )}
-              <CardImgOverlay>
-                <CardTitle>{cocktail.name}</CardTitle>
-              </CardImgOverlay>
+              <CardTitle
+                style={{
+                  marginTop: 16,
+                  marginLeft: 8,
+                  display: "inline-flex",
+                  paddingLeft: 8,
+                  paddingRight: 8,
+                }}
+              >
+                {cocktail.name}
+              </CardTitle>
             </Link>
           </Card>
         </div>
